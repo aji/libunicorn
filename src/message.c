@@ -2,7 +2,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <mowgli.h>
-#include <unicorn.h>
+
+#include "unicorn.h"
 
 int irc_message_parse(irc_message_t *msg, char *spec)
 {

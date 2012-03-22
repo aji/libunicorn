@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdio.h>
-#include <unicorn.h>
+
+#include "unicorn.h"
 
 int irc_sender_parse(irc_sender_t *sender, char *spec)
 {
