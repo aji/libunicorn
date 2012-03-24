@@ -2,7 +2,35 @@
 #define __INC_UNICORN_H__
 
 
-#include <mowgli.h>
+/*
+ * I'm not going to lie: a lot about how this linked list API works is
+ * heavily borrowed from libmowgli. I just really like it, I guess.
+ */
+
+struct irc_node_ {
+        struct irc_node_ *next, *prev;
+        void *data;
+};
+struct irc_list_ {
+        struct irc_node_ *head, *tail;
+        unsigned count;
+};
+
+typedef struct irc_node_ irc_node_t;
+typedef struct irc_list_ irc_list_t;
+
+#define irc_list_for_each(curr, list) \
+        for((curr) = (list)->head; (curr) != NULL; (curr) = (curr)->next)
+#define irc_list_for_each_safe(curr, next, list) \
+        for((curr) = (list)->head, (next) = (curr) ? (curr)->next : NULL; \
+                (curr) != NULL; \
+                (curr) = (next), (next) = (curr) ? (curr)->next : NULL)
+
+/* src/list.c */
+extern irc_node_t *irc_node_create(); // malloc/memset wrapper :/
+extern int irc_node_add(void *data, irc_node_t *node, irc_list_t *list);
+extern int irc_node_delete(irc_node_t *node, irc_list_t *list);
+
 
 /*
  * NOTE: the formatter functions (irc_sender_format and
@@ -47,7 +75,7 @@ struct irc_message_ {
         char *command;
 
         /* arguments */
-        mowgli_list_t args;
+        irc_list_t args;
 };
 typedef struct irc_message_ irc_message_t;
 

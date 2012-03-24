@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
-#include <mowgli.h>
 
 #include "unicorn.h"
 
@@ -28,10 +28,10 @@ int irc_message_parse(irc_message_t *msg, char *spec)
         // and now args repeatedly
         while(spec && *spec) {
                 if (*spec == ':') {
-                        mowgli_node_add(spec + 1, mowgli_node_create(), &msg->args);
+                        irc_node_add(spec + 1, irc_node_create(), &msg->args);
                         break;
                 } else {
-                        mowgli_node_add(spec, mowgli_node_create(), &msg->args);
+                        irc_node_add(spec, irc_node_create(), &msg->args);
                         strtok_r(spec, " \r\n", &spec);
                 }
         }
@@ -50,7 +50,7 @@ int irc_message_parse(irc_message_t *msg, char *spec)
 
 int irc_message_format(irc_message_t *msg, char *buf, size_t n)
 {
-        mowgli_node_t *curr;
+        irc_node_t *curr;
 
         // clear the buffer
         if (n == 0)
@@ -70,7 +70,7 @@ int irc_message_format(irc_message_t *msg, char *buf, size_t n)
         strncat(buf, msg->command, n - strlen(buf));
 
         // and finally the arguments
-        MOWGLI_LIST_FOREACH(curr, msg->args.head) {
+        irc_list_for_each(curr, &msg->args) {
                 strncat(buf, " ", n - strlen(buf));
 
                 if (curr->next == NULL) {
