@@ -2,7 +2,7 @@
 #include "unicorn.h"
 
 
-irc_node_t *irc_node_alloc()
+irc_node_t *irc_node_create()
 {
         irc_node_t *node;
 
