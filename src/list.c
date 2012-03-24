@@ -15,6 +15,11 @@ irc_node_t *irc_node_create()
         return node;
 }
 
+void irc_node_free(irc_node_t *node)
+{
+        free(node);
+}
+
 int irc_node_add(void *data, irc_node_t *node, irc_list_t *list)
 {
         if (node == NULL || list == NULL)

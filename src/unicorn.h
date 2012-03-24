@@ -28,6 +28,7 @@ typedef struct irc_list_ irc_list_t;
 
 /* src/list.c */
 extern irc_node_t *irc_node_create(); // malloc/memset wrapper :/
+extern void irc_node_free(irc_node_t *node); // free wrapper :/
 extern int irc_node_add(void *data, irc_node_t *node, irc_list_t *list);
 extern int irc_node_delete(irc_node_t *node, irc_list_t *list);
 
