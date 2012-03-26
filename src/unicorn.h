@@ -91,7 +91,7 @@ struct irc_mode_ops_ {
         int (*clear_arg)(struct irc_mode_ops_ *ops, char mode, char *arg);
         int (*set_arg)(struct irc_mode_ops_ *ops, char mode, char *arg);
         void *privdata;
-}
+};
 typedef struct irc_mode_ops_ irc_mode_ops_t;
 
 /* src/mode.c */
