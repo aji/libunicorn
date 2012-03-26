@@ -12,18 +12,20 @@ the grammar in RFC 1459) to and from C strings. In theory, any protocol
 which uses IRC-like messages (i.e. ":sender COMMAND arg arg :long arg")
 could make use of the parsers and formatters in `libunicorn`.
 
+In addition to these parsers and formatters, `libunicorn` also contains
+a variety of client-oriented capabilities. One such capability is mode
+string parsing. `libunicorn` can take a mode string such as "-s+mi"
+and call user-specified callbacks for each set and cleared mode. This
+is a small but frequently neglected feature of many small IRC clients
+(such as poorly-written IRC bots).
+
 # Dependencies
 
-`libunicorn` currently depends on `libmowgli-2`. However, the only mowgli
-functionalities being used are mowgli's container classes which are a
-small portion of the functionality offered by `libmowgli-2`. `libunicorn`
-will probably reimplement a few of these to eliminate the `libmowgli-2`
-dependency.
-
-The only other depedency is a working standard C library that implements
-functions such as `strncat` and `strtok_r`. `libunicorn` aims to avoid
-the socket layer and I/O as completely as possible, serving as little
-more than a box of tools to be used by larger applications.
+The only depedency is a working standard C library that implements
+functions such as `strncat` and `strtok_r`. `libunicorn` aims to
+avoid the socket layer, memory management, and I/O as completely as
+possible, serving as little more than a box of tools to be used by
+larger applications.
 
 # Documentation
 
