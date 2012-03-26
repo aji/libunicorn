@@ -2,6 +2,9 @@
 #define __INC_UNICORN_H__
 
 
+#include <stddef.h>
+
+
 /*
  * I'm not going to lie: a lot about how this linked list API works is
  * heavily borrowed from libmowgli. I just really like it, I guess.
