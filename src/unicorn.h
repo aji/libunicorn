@@ -85,4 +85,17 @@ extern int irc_message_parse(irc_message_t *msg, char *spec);
 extern int irc_message_format(irc_message_t *msg, char *buf, size_t n);
 
 
+struct irc_mode_ops_ {
+        int (clear)(struct irc_mode_ops_ *ops, char mode);
+        int (set)(struct irc_mode_ops_ *ops, char mode);
+        int (clear_arg)(struct irc_mode_ops_ *ops, char mode, char *arg);
+        int (set_arg)(struct irc_mode_ops_ *ops, char mode, char *arg);
+        void *privdata;
+}
+typedef struct irc_mode_ops_ irc_mode_ops_t;
+
+/* src/mode.c */
+extern int irc_mode_parse(irc_mode_ops_t *ops, char *modespec, irc_node_t *args);
+
+
 #endif
