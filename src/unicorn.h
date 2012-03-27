@@ -5,6 +5,8 @@
 #include <stddef.h>
 
 
+/* src/list.c */
+
 /*
  * I'm not going to lie: a lot about how this linked list API works is
  * heavily borrowed from libmowgli. I just really like it, I guess.
@@ -29,12 +31,13 @@ typedef struct irc_list_ irc_list_t;
                 (curr) != NULL; \
                 (curr) = (next), (next) = (curr) ? (curr)->next : NULL)
 
-/* src/list.c */
 extern irc_node_t *irc_node_create(); // malloc/memset wrapper :/
 extern void irc_node_free(irc_node_t *node); // free wrapper :/
 extern int irc_node_add(void *data, irc_node_t *node, irc_list_t *list);
 extern int irc_node_delete(irc_node_t *node, irc_list_t *list);
 
+
+/* src/dict.c */
 
 /*
  * Yeah, this is borrowed from libmowgli also...
@@ -69,7 +72,6 @@ typedef struct irc_dict_node_ irc_dict_node_t;
 typedef union irc_dict_elem_ irc_dict_elem_t;
 typedef struct irc_dict_ irc_dict_t;
 
-/* src/dict.c */
 extern irc_dict_elem_t *irc_dict_leaf_create(char *canonized);
 extern irc_dict_elem_t *irc_dict_node_create();
 extern void irc_dict_elem_free(irc_dict_elem_t *elem);
@@ -86,6 +88,8 @@ extern int irc_dict_delete(irc_dict_t *dict, const char *key);
  * will never write a null byte past the end of the buffer, but will
  * always be sure to terminate buf with a null byte.
  */
+
+/* src/sender.c */
 
 #define IRC_SENDER_NONE   0
 #define IRC_SENDER_SERVER 1
@@ -108,10 +112,11 @@ union irc_sender_ {
 };
 typedef union irc_sender_ irc_sender_t;
 
-/* src/sender.c */
 extern int irc_sender_parse(irc_sender_t *sender, char *spec);
 extern int irc_sender_format(irc_sender_t *sender, char *buf, size_t n);
 
+
+/* src/message.c */
 
 struct irc_message_ {
         /* optional sender */
@@ -125,10 +130,11 @@ struct irc_message_ {
 };
 typedef struct irc_message_ irc_message_t;
 
-/* src/message.c */
 extern int irc_message_parse(irc_message_t *msg, char *spec);
 extern int irc_message_format(irc_message_t *msg, char *buf, size_t n);
 
+
+/* src/mode.c */
 
 struct irc_mode_ops_ {
         int (*clear)(struct irc_mode_ops_ *ops, char mode);
@@ -139,11 +145,11 @@ struct irc_mode_ops_ {
 };
 typedef struct irc_mode_ops_ irc_mode_ops_t;
 
-/* src/mode.c */
 extern int irc_mode_parse(irc_mode_ops_t *ops, char *modespec, char *argmodes, irc_node_t *args);
 
 
 /* src/nick.c */
+
 extern void irc_nick_canonize_null(char *nick);
 extern void irc_nick_canonize_toupper(char *nick);
 extern void irc_nick_canonize_rfc1459(char *nick);
