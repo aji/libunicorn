@@ -37,6 +37,48 @@ extern int irc_node_delete(irc_node_t *node, irc_list_t *list);
 
 
 /*
+ * Yeah, this is borrowed from libmowgli also...
+ */
+
+#define IRC_DICT_TYPE_LEAF 0
+#define IRC_DICT_TYPE_NODE -1
+
+union irc_dict_elem_;
+struct irc_dict_leaf_ {
+        int type;
+        union irc_dict_elem_ *parent;
+        char *canonized;
+        void *data;
+};
+struct irc_dict_node_ {
+        int type;
+        union irc_dict_elem_ *parent;
+        union irc_dict_elem_ *child[16];
+};
+union irc_dict_elem_ {
+        int type;
+        struct irc_dict_leaf_ leaf;
+        struct irc_dict_node_ node;
+};
+struct irc_dict_ {
+        void (*canonize)(char *key);
+        union irc_dict_elem_ *root;
+};
+typedef struct irc_dict_leaf_ irc_dict_leaf_t;
+typedef struct irc_dict_node_ irc_dict_node_t;
+typedef union irc_dict_elem_ irc_dict_elem_t;
+typedef struct irc_dict_ irc_dict_t;
+
+/* src/dict.c */
+extern irc_dict_elem_t *irc_dict_leaf_create(char *canonized);
+extern irc_dict_elem_t *irc_dict_node_create();
+extern void irc_dict_elem_free(irc_dict_elem_t *elem);
+extern int irc_dict_add(irc_dict_t *dict, const char *key, void *data);
+extern void *irc_dict_get(irc_dict_t *dict, const char *key);
+extern int irc_dict_delete(irc_dict_t *dict, const char *key);
+
+
+/*
  * NOTE: the formatter functions (irc_sender_format and
  * irc_message_format) ask for a buffer size argument. It wouldn't be
  * nice of us to write to more memory than you want us to. strlen(buf)
@@ -99,6 +141,11 @@ typedef struct irc_mode_ops_ irc_mode_ops_t;
 
 /* src/mode.c */
 extern int irc_mode_parse(irc_mode_ops_t *ops, char *modespec, char *argmodes, irc_node_t *args);
+
+
+/* src/nick.c */
+extern void irc_nick_canonize_null(char *nick);
+extern void irc_nick_canonize_rfc1459(char *nick);
 
 
 #endif
