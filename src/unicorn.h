@@ -153,6 +153,7 @@ extern int irc_mode_parse(irc_mode_ops_t *ops, char *modespec, char *argmodes, i
 extern void irc_nick_canonize_null(char *nick);
 extern void irc_nick_canonize_toupper(char *nick);
 extern void irc_nick_canonize_rfc1459(char *nick);
+extern void irc_nick_canonize_strict_rfc1459(char *nick);
 
 
 /* src/isupport.c */
