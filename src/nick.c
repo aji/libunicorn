@@ -6,6 +6,14 @@ void irc_nick_canonize_null(char *nick)
         return;
 }
 
+void irc_nick_canonize_toupper(char *nick)
+{
+        while (*nick) {
+                *nick = toupper(*nick);
+                nick++;
+        }
+}
+
 void irc_nick_canonize_rfc1459(char *nick)
 {
         while (*nick) {
