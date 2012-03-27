@@ -155,4 +155,40 @@ extern void irc_nick_canonize_toupper(char *nick);
 extern void irc_nick_canonize_rfc1459(char *nick);
 
 
+/* src/isupport.c */
+
+#define IRC_ISUPPORT_CASEMAPPING_ASCII 0
+#define IRC_ISUPPORT_CASEMAPPING_RFC1459 1
+#define IRC_ISUPPORT_CASEMAPPING_STRICT_RFC1459 2
+
+struct irc_isupport_ {
+        int casemapping;
+
+        struct {
+                char *list;
+                char *arg_always;
+                char *arg_onset;
+                char *noarg;
+                size_t n;
+        } chanmodes;
+
+        char *chantypes;
+        size_t chantypeslen;
+
+        int modes;
+
+        int nicklen;
+
+        struct {
+                char *mode;
+                char *prefix;
+                size_t n;
+        } prefix;
+};
+typedef struct irc_isupport_ irc_isupport_t;
+
+// This function strncpy's to non-NULL string types
+// The args in msg are not left intact
+extern int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg);
+
 #endif
