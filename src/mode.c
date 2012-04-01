@@ -1,7 +1,8 @@
 #include <string.h>
+#include <mowgli.h>
 #include "unicorn.h"
 
-int irc_mode_parse(irc_mode_ops_t *ops, char *modespec, char *argmodes, irc_node_t *arghead)
+int irc_mode_parse(irc_mode_ops_t *ops, char *modespec, char *argmodes, mowgli_node_t *arghead)
 {
         int error = 0;
         int (*cb)(irc_mode_ops_t*, char) = NULL;

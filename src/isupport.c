@@ -1,4 +1,5 @@
 #include <string.h>
+#include <mowgli.h>
 #include "unicorn.h"
 
 char *irc_isupport_strtok(char **buf, int chr)
@@ -122,7 +123,7 @@ int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg)
 {
         char *param, *value;
         int error = 0;
-        irc_node_t *curr;
+        mowgli_node_t *curr;
 
         int (*cb)(irc_isupport_t*, char*);
 
@@ -131,7 +132,7 @@ int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg)
                 return -1;
 
         // then iterate over each arg
-        irc_list_for_each(curr, &msg->args) {
+        MOWGLI_LIST_FOREACH(curr, msg->args.head) {
                 // Nickname is always first arg, and "are supported by
                 // this server" is always last. Ignore both
                 if (curr->prev == NULL || curr->next == NULL)
