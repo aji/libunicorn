@@ -21,11 +21,10 @@ is a small but frequently neglected feature of many small IRC clients
 
 # Dependencies
 
-The only depedency is a working standard C library that implements
-functions such as `strncat` and `strtok_r`. `libunicorn` aims to
-avoid the socket layer, memory management, and I/O as completely as
-possible, serving as little more than a box of tools to be used by
-larger applications.
+`libunicorn` currently depends only on `libmowgli-2`. Although
+`libunicorn` only uses a small subset of the features in `libmowgli-2`,
+the library was created to be used with applications that will make use of
+`libmowgli-2`.
 
 # Documentation
 
