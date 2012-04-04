@@ -48,30 +48,28 @@ int irc_sender_parse(irc_sender_t *sender, char *spec)
         return 0;
 }
 
-int irc_sender_format(irc_sender_t *sender, char *buf, size_t n)
+int irc_sender_format(irc_sender_t *sender, mowgli_string_t *str)
 {
-        if (n == 0)
-                return -1;
+        return_val_if_fail(str != NULL, -1);
 
         switch (sender->type) {
         case IRC_SENDER_NONE:
-                buf[0] = '\0';
                 return 0;
 
         case IRC_SENDER_SERVER:
-                strncpy(buf, sender->server.name, n);
+                str->append(str, sender->server.name, strlen(sender->server.name));
                 return 0;
 
         case IRC_SENDER_USER:
-                strncpy(buf, sender->user.nick, n);
+                str->append(str, sender->user.nick, strlen(sender->user.nick));
 
                 if (sender->user.ident) {
-                        strcat(buf, "!");
-                        strncat(buf, sender->user.ident, n - strlen(buf));
+                        str->append_char(str, '!');
+                        str->append(str, sender->user.ident, strlen(sender->user.ident));
                 }
                 if (sender->user.host) {
-                        strcat(buf, "@");
-                        strncat(buf, sender->user.host, n - strlen(buf));
+                        str->append_char(str, '@');
+                        str->append(str, sender->user.host, strlen(sender->user.host));
                 }
 
                 return 0;

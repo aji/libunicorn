@@ -39,7 +39,7 @@ union irc_sender_ {
 typedef union irc_sender_ irc_sender_t;
 
 extern int irc_sender_parse(irc_sender_t *sender, char *spec);
-extern int irc_sender_format(irc_sender_t *sender, char *buf, size_t n);
+extern int irc_sender_format(irc_sender_t *sender, mowgli_string_t *str);
 
 
 /* src/message.c */
@@ -57,7 +57,7 @@ struct irc_message_ {
 typedef struct irc_message_ irc_message_t;
 
 extern int irc_message_parse(irc_message_t *msg, char *spec);
-extern int irc_message_format(irc_message_t *msg, char *buf, size_t n);
+extern int irc_message_format(irc_message_t *msg, mowgli_string_t *str);
 
 
 /* src/mode.c */

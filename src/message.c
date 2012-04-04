@@ -49,40 +49,37 @@ int irc_message_parse(irc_message_t *msg, char *spec)
         return 0;
 }
 
-int irc_message_format(irc_message_t *msg, char *buf, size_t n)
+int irc_message_format(irc_message_t *msg, mowgli_string_t *str)
 {
         mowgli_node_t *curr;
 
-        // clear the buffer
-        if (n == 0)
-                return -1;
-        *buf = '\0';
+        return_val_if_fail(str != NULL, -1);
 
         // first the sender, if any
         if (msg->sender.type != IRC_SENDER_NONE) {
-                strncat(buf, ":", n - strlen(buf));
-                irc_sender_format(&msg->sender, buf + 1, n - 1);
-                strncat(buf, " ", n - strlen(buf));
+                str->append_char(str, ':');
+                irc_sender_format(&msg->sender, str);
+                str->append_char(str, ' ');
         }
 
         // then the command
         if (msg->command == NULL)
                 return -1;
-        strncat(buf, msg->command, n - strlen(buf));
+        str->append(str, msg->command, strlen(msg->command));
 
         // and finally the arguments
         MOWGLI_LIST_FOREACH(curr, msg->args.head) {
-                strncat(buf, " ", n - strlen(buf));
+                str->append_char(str, ' ');
 
                 if (curr->next == NULL) {
                         if (strchr(curr->data, ' ') != NULL
                                         || !strcmp(msg->command, "PRIVMSG")
                                         || !strcmp(msg->command, "NOTICE")) {
-                                strncat(buf, ":", n - strlen(buf));
+                                str->append_char(str, ':');
                         }
                 }
 
-                strncat(buf, curr->data, n - strlen(buf));
+                str->append(str, curr->data, strlen(curr->data));
         }
 
         return 0;
