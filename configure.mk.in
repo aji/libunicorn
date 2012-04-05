@@ -1,0 +1,2 @@
+CC = @CC@
+CFLAGS = @CFLAGS@ $(shell pkg-config --cflags libmowgli-2)
