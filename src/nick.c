@@ -5,7 +5,7 @@ void irc_nick_canonize_null(char *nick)
 {
 }
 
-void irc_nick_canonize_toupper(char *nick)
+void irc_nick_canonize_ascii(char *nick)
 {
         while (*nick) {
                 *nick = toupper(*nick);
