@@ -145,6 +145,8 @@ int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg)
                 if (value)
                         *value++ = '\0';
 
+                cb = NULL;
+
                 if (!strcmp(param, "CASEMAPPING"))
                         cb = irc_isupport_casemapping;
                 if (!strcmp(param, "CHANMODES"))
@@ -158,7 +160,8 @@ int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg)
                 if (!strcmp(param, "PREFIX"))
                         cb = irc_isupport_prefix;
 
-                error = cb(isupport, value) < 0 ? -1 : error;
+                if (cb)
+                        error = cb(isupport, value) < 0 ? -1 : error;
         }
 
         return 0;
