@@ -2,6 +2,13 @@
 #include <mowgli.h>
 #include "unicorn.h"
 
+// function naming issue? ... maybe
+void mowgli_string_copy(mowgli_string_t *self, const char *src, size_t n)
+{
+        self->reset(self);
+        self->append(self, src, n);
+}
+
 char *irc_isupport_strtok(char **buf, int chr)
 {
         char *at;
@@ -43,7 +50,6 @@ int irc_isupport_chanmodes(irc_isupport_t *isupport, char *value)
         if (value == NULL)
                 return -1;
 
-        // it's a bit of a hack to use strtok_r like this, but MEH!
         d = value;
         a = irc_isupport_strtok(&d, ',');
         b = irc_isupport_strtok(&d, ',');
@@ -52,16 +58,14 @@ int irc_isupport_chanmodes(irc_isupport_t *isupport, char *value)
         if (a == NULL || b == NULL || c == NULL || d[0] == '\0')
                 return -1;
 
-        n = isupport->chanmodes.n;
-
         if (isupport->chanmodes.list)
-                strncpy(isupport->chanmodes.list, a, n-1);
+                mowgli_string_copy(isupport->chanmodes.list, a, strlen(a));
         if (isupport->chanmodes.arg_always)
-                strncpy(isupport->chanmodes.arg_always, b, n-1);
+                mowgli_string_copy(isupport->chanmodes.arg_always, b, strlen(b));
         if (isupport->chanmodes.arg_onset)
-                strncpy(isupport->chanmodes.arg_onset, c, n-1);
+                mowgli_string_copy(isupport->chanmodes.arg_onset, c, strlen(c));
         if (isupport->chanmodes.noarg)
-                strncpy(isupport->chanmodes.noarg, d, n-1);
+                mowgli_string_copy(isupport->chanmodes.noarg, d, strlen(d));
 
         return 0;
 }
@@ -72,7 +76,7 @@ int irc_isupport_chantypes(irc_isupport_t *isupport, char *value)
                 return -1;
 
         if (isupport->chantypes)
-                strncpy(isupport->chantypes, value, isupport->chantypeslen);
+                mowgli_string_copy(isupport->chantypes, value, strlen(value));
 
         return 0;
 }
@@ -109,12 +113,10 @@ int irc_isupport_prefix(irc_isupport_t *isupport, char *value)
         if (a == NULL)
                 return -1;
 
-        n = isupport->prefix.n;
-
         if (isupport->prefix.mode)
-                strncpy(isupport->prefix.mode, a, n-1);
+                mowgli_string_copy(isupport->prefix.mode, a, strlen(a));
         if (isupport->prefix.prefix)
-                strncpy(isupport->prefix.prefix, b, n-1);
+                mowgli_string_copy(isupport->prefix.prefix, b, strlen(b));
 
         return 0;
 }

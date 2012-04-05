@@ -92,24 +92,21 @@ struct irc_isupport_ {
         int casemapping;
 
         struct {
-                char *list;
-                char *arg_always;
-                char *arg_onset;
-                char *noarg;
-                size_t n;
+                mowgli_string_t *list;
+                mowgli_string_t *arg_always;
+                mowgli_string_t *arg_onset;
+                mowgli_string_t *noarg;
         } chanmodes;
 
-        char *chantypes;
-        size_t chantypeslen;
+        mowgli_string_t *chantypes;
 
         int modes;
 
         int nicklen;
 
         struct {
-                char *mode;
-                char *prefix;
-                size_t n;
+                mowgli_string_t *mode;
+                mowgli_string_t *prefix;
         } prefix;
 };
 typedef struct irc_isupport_ irc_isupport_t;
