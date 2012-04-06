@@ -6,9 +6,11 @@
 
 #include "unicorn.h"
 
-int irc_message_parse(irc_message_t *msg, char *spec)
+int irc_message_parse_buffer(irc_message_t *msg)
 {
-        char *at;
+	char *spec, *at;
+
+	spec = msg->buffer;
 
         // first the sender, if any
         if (spec[0] == ':') {
@@ -47,6 +49,14 @@ int irc_message_parse(irc_message_t *msg, char *spec)
         }
 
         return 0;
+}
+
+int irc_message_parse(irc_message_t *msg, const char *spec)
+{
+	strncpy(msg->buffer, spec, 511);
+	msg->buffer[512] = '\0';
+
+	return irc_message_parse_buffer(msg);
 }
 
 int irc_message_format(irc_message_t *msg, mowgli_string_t *str)

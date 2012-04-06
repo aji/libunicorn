@@ -6,15 +6,6 @@
 #include <mowgli.h>
 
 
-/*
- * NOTE: the formatter functions (irc_sender_format and
- * irc_message_format) ask for a buffer size argument. It wouldn't be
- * nice of us to write to more memory than you want us to. strlen(buf)
- * will always end up being less than n. This is because the formatters
- * will never write a null byte past the end of the buffer, but will
- * always be sure to terminate buf with a null byte.
- */
-
 /* src/sender.c */
 
 #define IRC_SENDER_NONE   0
@@ -45,6 +36,9 @@ extern int irc_sender_format(irc_sender_t *sender, mowgli_string_t *str);
 /* src/message.c */
 
 struct irc_message_ {
+	/* 512-byte character buffer */
+	char buffer[512];
+
         /* optional sender */
         irc_sender_t sender;
 
@@ -56,7 +50,8 @@ struct irc_message_ {
 };
 typedef struct irc_message_ irc_message_t;
 
-extern int irc_message_parse(irc_message_t *msg, char *spec);
+extern int irc_message_parse_buffer(irc_message_t *msg);
+extern int irc_message_parse(irc_message_t *msg, const char *spec);
 extern int irc_message_format(irc_message_t *msg, mowgli_string_t *str);
 
 
