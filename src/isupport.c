@@ -31,12 +31,11 @@ int irc_isupport_casemapping(irc_isupport_t *isupport, char *value)
 {
 	if (value == NULL)
 		isupport->casemapping = IRC_ISUPPORT_CASEMAPPING_RFC1459;
-
-	if (!strcmp(value, "ascii"))
+	else if (!strcmp(value, "ascii"))
 		isupport->casemapping = IRC_ISUPPORT_CASEMAPPING_ASCII;
-	if (!strcmp(value, "rfc1459"))
+	else if (!strcmp(value, "rfc1459"))
 		isupport->casemapping = IRC_ISUPPORT_CASEMAPPING_RFC1459;
-	if (!strcmp(value, "strict-rfc1459"))
+	else if (!strcmp(value, "strict-rfc1459"))
 		isupport->casemapping = IRC_ISUPPORT_CASEMAPPING_STRICT_RFC1459;
 
 	return 0;
@@ -149,15 +148,15 @@ int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg)
 
 		if (!strcmp(param, "CASEMAPPING"))
 			cb = irc_isupport_casemapping;
-		if (!strcmp(param, "CHANMODES"))
+		else if (!strcmp(param, "CHANMODES"))
 			cb = irc_isupport_chanmodes;
-		if (!strcmp(param, "CHANTYPES"))
+		else if (!strcmp(param, "CHANTYPES"))
 			cb = irc_isupport_chantypes;
-		if (!strcmp(param, "MODES"))
+		else if (!strcmp(param, "MODES"))
 			cb = irc_isupport_modes;
-		if (!strcmp(param, "NICKLEN"))
+		else if (!strcmp(param, "NICKLEN"))
 			cb = irc_isupport_nicklen;
-		if (!strcmp(param, "PREFIX"))
+		else if (!strcmp(param, "PREFIX"))
 			cb = irc_isupport_prefix;
 
 		if (cb)
