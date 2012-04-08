@@ -4,8 +4,7 @@ include ../build.mk
 SOURCES = isupport.c \
 		message.c \
 		mode.c \
-		nick.c \
-		sender.c
+		nick.c
 OBJECTS = ${SOURCES:.c=.o}
 
 compile:

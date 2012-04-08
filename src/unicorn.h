@@ -6,41 +6,32 @@
 #include <mowgli.h>
 
 
-/* src/sender.c */
-
-#define IRC_SENDER_NONE   0
-#define IRC_SENDER_SERVER 1
-#define IRC_SENDER_USER   2
-
-union irc_sender_ {
-        int type;
-
-        struct {
-                int type;
-                char *name;
-        } server;
-
-        struct {
-                int type;
-                char *nick;
-                char *ident;
-                char *host;
-        } user;
-};
-typedef union irc_sender_ irc_sender_t;
-
-extern int irc_sender_parse(irc_sender_t *sender, char *spec);
-extern int irc_sender_format(irc_sender_t *sender, mowgli_string_t *str);
-
-
 /* src/message.c */
+
+#define IRC_MESSAGE_SOURCE_NONE   0
+#define IRC_MESSAGE_SOURCE_SERVER 1
+#define IRC_MESSAGE_SOURCE_USER   2
 
 struct irc_message_ {
 	/* 512-byte character buffer */
 	char buffer[512];
 
-        /* optional sender */
-        irc_sender_t sender;
+	/* potential source */
+	union irc_message_source_ {
+		unsigned type;
+
+		struct {
+			unsigned type;
+			char *name;
+		} server;
+
+		struct {
+			unsigned type;
+			char *nick;
+			char *ident;
+			char *host;
+		} user;
+	} source;
 
         /* mandatory command; numerics remain ASCII-encoded */
         char *command;
@@ -48,7 +39,11 @@ struct irc_message_ {
         /* arguments */
         mowgli_list_t args;
 };
+typedef union irc_message_source_ irc_message_source_t;
 typedef struct irc_message_ irc_message_t;
+
+extern int irc_message_source_parse(irc_message_source_t *source, char *spec);
+extern int irc_message_source_format(irc_message_source_t *source, mowgli_string_t *str);
 
 extern int irc_message_parse_buffer(irc_message_t *msg);
 extern int irc_message_parse(irc_message_t *msg, const char *spec);
