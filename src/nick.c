@@ -7,37 +7,37 @@ void irc_nick_canonize_null(char *nick)
 
 void irc_nick_canonize_ascii(char *nick)
 {
-        while (*nick) {
-                *nick = toupper(*nick);
-                nick++;
-        }
+	while (*nick) {
+		*nick = toupper(*nick);
+		nick++;
+	}
 }
 
 void irc_nick_canonize_rfc1459(char *nick)
 {
-        while (*nick) {
-                *nick = toupper(*nick);
+	while (*nick) {
+		*nick = toupper(*nick);
 
-                switch (*nick) {
-                case '{': *nick = '['; break;
-                case '}': *nick = ']'; break;
-                case '|': *nick = '\\'; break;
-                case '^': *nick = '~'; break;
-                }
-        }
+		switch (*nick) {
+		case '{': *nick = '['; break;
+		case '}': *nick = ']'; break;
+		case '|': *nick = '\\'; break;
+		case '^': *nick = '~'; break;
+		}
+	}
 }
 
 void irc_nick_canonize_strict_rfc1459(char *nick)
 {
-        while (*nick) {
-                *nick = toupper(*nick);
+	while (*nick) {
+		*nick = toupper(*nick);
 
-                switch (*nick) {
-                case '{': *nick = '['; break;
-                case '}': *nick = ']'; break;
-                case '|': *nick = '\\'; break;
-                }
+		switch (*nick) {
+		case '{': *nick = '['; break;
+		case '}': *nick = ']'; break;
+		case '|': *nick = '\\'; break;
+		}
 
-                nick++;
-        }
+		nick++;
+	}
 }
