@@ -105,4 +105,36 @@ typedef struct irc_isupport_ irc_isupport_t;
 // The args in msg are not left intact
 extern int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg);
 
+
+/* src/client.c */
+
+struct irc_client_peer_ {
+	char *nick;
+};
+struct irc_client_channel_user {
+	struct irc_client_peer_ *peer;
+	char prefix;
+};
+struct irc_client_channel_ {
+	mowgli_string_t *name;
+	mowgli_string_t *topic;
+	mowgli_list_t *users;
+};
+struct irc_client_ {
+	mowgli_string_t *nick;
+	mowgli_patricia_t *peers;
+	mowgli_patricia_t *channels;
+
+	int (*nick_cmp)(char*, char*);
+};
+typedef struct irc_client_peer_ *irc_client_peer_t;
+typedef struct irc_client_channel_user_ *irc_client_channel_user_t;
+typedef struct irc_client_channel_ *irc_client_channel_t;
+typedef struct irc_client_ *irc_client_t;
+
+extern int irc_client_init(irc_client_t *client);
+extern irc_client_t *irc_client_create(void);
+extern int irc_client_process_message(irc_client_t *client, irc_message_t *msg);
+
+
 #endif
