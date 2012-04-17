@@ -126,6 +126,8 @@ struct irc_client {
 	mowgli_patricia_t *peers;
 	mowgli_patricia_t *channels;
 
+	irc_isupport_t *isupport;
+
 	int (*nick_cmp)(char*, char*);
 };
 typedef struct irc_client_peer irc_client_peer_t;

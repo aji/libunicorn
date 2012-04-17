@@ -342,13 +342,22 @@ int irc_client_peer_nick(irc_client_t *client, char *oldnick, char *newnick)
 
 int irc_client_process_message_server(irc_client_t *client, irc_message_t *msg)
 {
+	char *my_nick = NULL;
+
 	if (strlen(msg->command) == 3 && isdigit(msg->command[0]) &&
 				isdigit(msg->command[1]) && isdigit(msg->command[2])) {
 		// snag the nickname from numerics
-		return irc_client_do_nick(client, (char *)msg->args.head->data);
+		my_nick = (char*)msg->args.head->data;
+	}
+
+	if (!strcmp(msg->command, "005")) {
+		irc_isupport_parse(client->isupport, msg);
 	}
 
 	// TODO: process channel information (names 353 and topic 332/331)
+
+	if (my_nick != NULL && strcmp(my_nick, client->nick->str) != 0)
+		return irc_client_do_nick(client, my_nick);
 
 	return 0;
 }
