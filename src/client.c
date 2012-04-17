@@ -149,7 +149,7 @@ int irc_client_channel_destroy(irc_client_channel_t *channel)
 
 int irc_client_channel_join(irc_client_channel_t *channel, irc_client_peer_t *peer, char prefix)
 {
-	irc_client_channel_user *user;
+	irc_client_channel_user_t *user;
 
 	if (channel == NULL || peer == NULL)
 		return -1;
@@ -300,11 +300,11 @@ int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 
 	peer = mowgli_patricia_retrieve(client->peers, nick);
 	if (peer == NULL) {
-		peer = irc_client_peer_create(peer);
+		peer = irc_client_peer_create(nick);
 		mowgli_patricia_add(client->peers, nick, peer);
 	}
 
-	return irc_client_channel_join(channel, peer);
+	return irc_client_channel_join(channel, peer, ' ');
 }
 
 int irc_client_peer_part(irc_client_t *client, char *nick, char *chan)
