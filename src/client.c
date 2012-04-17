@@ -34,6 +34,20 @@ fail_nick:
 	return -1;
 }
 
+int irc_client_deinit(irc_client_t *client)
+{
+	if (client->nick != NULL)
+		mowgli_string_destroy(client->nick);
+	if (client->peers != NULL)
+		mowgli_patricia_destroy(client->peers);
+	if (client->channels != NULL)
+		mowgli_patricia_destroy(client->peers);
+
+	client->nick = client->peers = client->channels = NULL;
+
+	return 0;
+}
+
 irc_client_t *irc_client_create(void)
 {
 	irc_client_t *client;
@@ -48,6 +62,16 @@ irc_client_t *irc_client_create(void)
 	}
 
 	return client;
+}
+
+int irc_client_destroy(irc_client_t *client)
+{
+	if (irc_client_deinit(client) < 0)
+		return -1;
+
+	mowgli_free(client);
+
+	return 0;
 }
 
 
