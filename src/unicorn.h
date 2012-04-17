@@ -12,12 +12,12 @@
 #define IRC_MESSAGE_SOURCE_SERVER 1
 #define IRC_MESSAGE_SOURCE_USER   2
 
-struct irc_message_ {
+struct irc_message {
 	/* 512-byte character buffer */
 	char buffer[512];
 
 	/* potential source */
-	union irc_message_source_ {
+	union irc_message_source {
 		unsigned type;
 
 		struct {
@@ -39,8 +39,8 @@ struct irc_message_ {
         /* arguments */
         mowgli_list_t args;
 };
-typedef union irc_message_source_ irc_message_source_t;
-typedef struct irc_message_ irc_message_t;
+typedef union irc_message_source irc_message_source_t;
+typedef struct irc_message irc_message_t;
 
 extern int irc_message_source_parse(irc_message_source_t *source, char *spec);
 extern int irc_message_source_format(irc_message_source_t *source, mowgli_string_t *str);
@@ -52,14 +52,14 @@ extern int irc_message_format(irc_message_t *msg, mowgli_string_t *str);
 
 /* src/mode.c */
 
-struct irc_mode_ops_ {
+struct irc_mode_ops {
         int (*clear)(struct irc_mode_ops_ *ops, char mode);
         int (*set)(struct irc_mode_ops_ *ops, char mode);
         int (*clear_arg)(struct irc_mode_ops_ *ops, char mode, char *arg);
         int (*set_arg)(struct irc_mode_ops_ *ops, char mode, char *arg);
         void *privdata;
 };
-typedef struct irc_mode_ops_ irc_mode_ops_t;
+typedef struct irc_mode_ops irc_mode_ops_t;
 
 extern int irc_mode_parse(irc_mode_ops_t *ops, char *modespec, char *argmodes, mowgli_node_t *args);
 
@@ -78,7 +78,7 @@ extern void irc_nick_canonize_strict_rfc1459(char *nick);
 #define IRC_ISUPPORT_CASEMAPPING_RFC1459 1
 #define IRC_ISUPPORT_CASEMAPPING_STRICT_RFC1459 2
 
-struct irc_isupport_ {
+struct irc_isupport {
         int casemapping;
 
         struct {
@@ -99,7 +99,7 @@ struct irc_isupport_ {
                 mowgli_string_t *prefix;
         } prefix;
 };
-typedef struct irc_isupport_ irc_isupport_t;
+typedef struct irc_isupport irc_isupport_t;
 
 // This function strncpy's to non-NULL string types
 // The args in msg are not left intact
@@ -108,30 +108,30 @@ extern int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg);
 
 /* src/client.c */
 
-struct irc_client_peer_ {
+struct irc_client_peer {
 	mowgli_string_t *nick;
 	int ref;
 };
-struct irc_client_channel_user_ {
-	struct irc_client_peer_ *peer;
+struct irc_client_channel_user {
+	struct irc_client_peer *peer;
 	char prefix;
 };
-struct irc_client_channel_ {
+struct irc_client_channel {
 	mowgli_string_t *name;
 	mowgli_string_t *topic;
 	mowgli_list_t *users;
 };
-struct irc_client_ {
+struct irc_client {
 	mowgli_string_t *nick;
 	mowgli_patricia_t *peers;
 	mowgli_patricia_t *channels;
 
 	int (*nick_cmp)(char*, char*);
 };
-typedef struct irc_client_peer_ irc_client_peer_t;
-typedef struct irc_client_channel_user_ irc_client_channel_user_t;
-typedef struct irc_client_channel_ irc_client_channel_t;
-typedef struct irc_client_ irc_client_t;
+typedef struct irc_client_peer irc_client_peer_t;
+typedef struct irc_client_channel_user irc_client_channel_user_t;
+typedef struct irc_client_channel irc_client_channel_t;
+typedef struct irc_client irc_client_t;
 
 extern int irc_client_init(irc_client_t *client);
 extern irc_client_t *irc_client_create(void);
