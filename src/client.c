@@ -4,15 +4,165 @@
 #include "unicorn.h"
 
 
-int irc_client_init(irc_client_t *client)
-{
-	memset(client, 0, sizeof(*client));
+// Peer
 
+irc_client_peer_t *irc_client_peer_create(char *nick)
+{
+	irc_client_peer_t *peer;
+
+	peer = mowgli_alloc(sizeof(*peer));
+	if (peer == NULL)
+		return NULL;
+
+	peer->nick = mowgli_string_create();
+	if (peer->nick == NULL) {
+		mowgli_free(peer);
+		return NULL;
+	}
+
+	peer->nick->reset(peer->nick);
+	peer->nick->append(peer->nick, nick, strlen(nick));
+
+	peer->ref = 0;
+
+	return peer;
+}
+
+int irc_client_peer_destroy(irc_client_peer_t *peer)
+{
+	if (peer == NULL)
+		return -1;
+
+	mowgli_string_destroy(peer->nick);
+	mowgli_free(peer);
+
+	return 0;
+}
+
+void irc_client_peer_ref(irc_client_peer_t *peer)
+{
+	if (peer != NULL)
+		peer->ref += 1;
+}
+
+void irc_client_peer_unref(irc_client_peer_t *peer)
+{
+	if (peer == NULL)
+		return;
+
+	peer->ref -= 1;
+
+	if (peer->ref <= 0)
+		irc_client_peer_destroy(peer);
+}
+
+
+// Channel users
+
+irc_client_channel_user_t *irc_client_channel_user_create(irc_client_peer_t *peer, char prefix)
+{
+	irc_client_channel_user_t *user;
+
+	user = mowgli_alloc(sizeof(*user));
+	if (user == NULL)
+		return NULL;
+
+	user->peer = peer;
+	user->prefix = prefix;
+
+	irc_client_peer_ref(user->peer);
+
+	return user;
+}
+
+int irc_client_channel_user_destroy(irc_client_channel_user_t *user)
+{
+	if (user == NULL)
+		return -1;
+
+	irc_client_peer_unref(user->peer);
+
+	mowgli_free(user);
+
+	return 0;
+}
+
+
+// Channels
+
+irc_client_channel_t *irc_client_channel_create(char *name)
+{
+	irc_client_channel_t *channel;
+
+	channel = mowgli_alloc(sizeof(*channel));
+	if (channel == NULL)
+		goto fail_alloc;
+
+	channel->name = mowgli_string_create();
+	if (channel->name == NULL)
+		goto fail_name;
+
+	channel->topic = mowgli_string_create();
+	if (channel->topic == NULL)
+		goto fail_topic;
+
+	channel->users = mowgli_list_create();
+	if (channel->users == NULL)
+		goto fail_users;
+
+	return channel;
+
+fail_users:
+	mowgli_string_destroy(channel->topic);
+fail_topic:
+	mowgli_string_destroy(channel->name);
+fail_name:
+	mowgli_free(channel);
+fail_alloc:
+	return NULL;
+}
+
+int irc_client_channel_destroy(irc_client_channel_t *channel)
+{
+	mowgli_node_t *n, *tn;
+
+	if (channel != NULL)
+		return -1;
+
+	if (channel->name != NULL)
+		mowgli_string_destroy(channel->name);
+	if (channel->topic != NULL)
+		mowgli_string_destroy(channel->topic);
+	if (channel->users != NULL) {
+		MOWGLI_LIST_FOREACH_SAFE(n, tn, channel->users->head) {
+			irc_client_channel_user_destroy(n->data);
+			mowgli_node_free(n);
+		}
+
+		mowgli_list_free(channel->users);
+	}
+
+	mowgli_free(channel);
+
+	return 0;
+}
+
+
+// Client
+
+irc_client_t *irc_client_create(void)
+{
+	irc_client_t *client;
+
+	client = mowgli_alloc(sizeof(*client));
+	if (client == NULL)
+		goto fail_alloc;
+
+	memset(client, 0, sizeof(*client));
 
 	client->nick = mowgli_string_create();
 	if (client->nick == NULL)
 		goto fail_nick;
-
 
 	client->peers = mowgli_patricia_create(NULL);
 	if (client->peers == NULL)
@@ -22,52 +172,39 @@ int irc_client_init(irc_client_t *client)
 	if (client->channels == NULL)
 		goto fail_channels;
 
-	return 0;
+	return client;
 
 
 fail_channels:
-	mowgli_patricia_destroy(client->peers);
+	mowgli_patricia_destroy(client->peers, NULL, NULL);
 fail_peers:
 	mowgli_string_destroy(client->nick);
 fail_nick:
-	memset(client, 0, sizeof(*client));
-	return -1;
+	mowgli_free(client);
+fail_alloc:
+	return NULL;
 }
 
-int irc_client_deinit(irc_client_t *client)
+void irc_client_deinit_peers_cb(const char *key, void *data, void *unused)
 {
-	if (client->nick != NULL)
-		mowgli_string_destroy(client->nick);
-	if (client->peers != NULL)
-		mowgli_patricia_destroy(client->peers);
-	if (client->channels != NULL)
-		mowgli_patricia_destroy(client->peers);
-
-	client->nick = client->peers = client->channels = NULL;
-
-	return 0;
+	irc_client_peer_unref(data);
 }
-
-irc_client_t *irc_client_create(void)
+void irc_client_deinit_channels_cb(const char *key, void *data, void *unused)
 {
-	irc_client_t *client;
-
-	client = mowgli_alloc(sizeof(*client));
-	if (client == NULL)
-		return NULL;
-
-	if (irc_client_init(client) < 0) {
-		mowgli_free(client);
-		return NULL;
-	}
-
-	return client;
+	irc_client_channel_destroy(data);
 }
 
 int irc_client_destroy(irc_client_t *client)
 {
-	if (irc_client_deinit(client) < 0)
+	if (client == NULL)
 		return -1;
+
+	if (client->nick != NULL)
+		mowgli_string_destroy(client->nick);
+	if (client->peers != NULL)
+		mowgli_patricia_destroy(client->peers, irc_client_deinit_peers_cb, NULL);
+	if (client->channels != NULL)
+		mowgli_patricia_destroy(client->channels, irc_client_deinit_channels_cb, NULL);
 
 	mowgli_free(client);
 
@@ -75,22 +212,44 @@ int irc_client_destroy(irc_client_t *client)
 }
 
 
-int irc_client_do_join(irc_client_t *client, char *nick)
+// Client Actions
+
+int irc_client_do_join(irc_client_t *client, char *chan)
 {
-	// fetch channel, bail if exists
-	// create empty channel
+	irc_client_channel_t *channel;
+
+	channel = mowgli_patricia_retrieve(client->channels, chan);
+	if (channel != NULL)
+		return -1;
+
+	channel = irc_client_channel_create(chan);
+	if (channel == NULL)
+		return -1;
+
+	mowgli_patricia_add(client->channels, chan, channel);
+
+	return 0;
 }
 
-int irc_client_do_part(irc_client_t *client, char *nick)
+int irc_client_do_part(irc_client_t *client, char *chan)
 {
-	// fetch channel, bail if doesn't exist
-	// free peers for which this is the last channel
-	// free channel data
+	irc_client_channel_t *channel;
+
+	channel = mowgli_patricia_retrieve(client->channels, chan);
+	if (channel == NULL)
+		return -1;
+
+	mowgli_patricia_delete(client->channels, chan);
+
+	return irc_client_channel_destroy(channel);
 }
 
 int irc_client_do_nick(irc_client_t *client, char *nick)
 {
-	// change nick
+	client->nick->reset(client->nick);
+	client->nick->append(client->nick, nick, strlen(nick));
+
+	return 0;
 }
 
 
@@ -116,12 +275,14 @@ int irc_client_peer_nick(irc_client_t *client, char *peer, char *nick)
 }
 
 
+// Client message processing
+
 int irc_client_process_message_server(irc_client_t *client, irc_message_t *msg)
 {
 	if (strlen(msg->command) == 3 && isdigit(msg->command[0]) &&
 				isdigit(msg->command[1]) && isdigit(msg->command[2])) {
 		// snag the nickname from numerics
-		return irc_client_do_nick(client, (char *)msg->args.head->data;
+		return irc_client_do_nick(client, (char *)msg->args.head->data);
 	}
 
 	// TODO: process channel information (names 353 and topic 332/331)
@@ -150,10 +311,9 @@ int irc_client_process_message_self(irc_client_t *client, irc_message_t *msg)
 
 int irc_client_process_message_peer(irc_client_t *client, irc_message_t *msg)
 {
-	irc_client_peer_t *peer;
-	char *first_arg;
+	char *peer, *first_arg;
 
-	peer = irc_client_find_peer(client, msg->source.user.nick);
+	peer = msg->source.user.nick;
 	first_arg = (char*)msg->args.head->data;
 
 	if (!strcmp(msg->command, "JOIN")) {

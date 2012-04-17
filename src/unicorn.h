@@ -109,9 +109,10 @@ extern int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg);
 /* src/client.c */
 
 struct irc_client_peer_ {
-	char *nick;
+	mowgli_string_t *nick;
+	int ref;
 };
-struct irc_client_channel_user {
+struct irc_client_channel_user_ {
 	struct irc_client_peer_ *peer;
 	char prefix;
 };
@@ -127,10 +128,10 @@ struct irc_client_ {
 
 	int (*nick_cmp)(char*, char*);
 };
-typedef struct irc_client_peer_ *irc_client_peer_t;
-typedef struct irc_client_channel_user_ *irc_client_channel_user_t;
-typedef struct irc_client_channel_ *irc_client_channel_t;
-typedef struct irc_client_ *irc_client_t;
+typedef struct irc_client_peer_ irc_client_peer_t;
+typedef struct irc_client_channel_user_ irc_client_channel_user_t;
+typedef struct irc_client_channel_ irc_client_channel_t;
+typedef struct irc_client_ irc_client_t;
 
 extern int irc_client_init(irc_client_t *client);
 extern irc_client_t *irc_client_create(void);
