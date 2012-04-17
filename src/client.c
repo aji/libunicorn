@@ -126,7 +126,7 @@ int irc_client_channel_destroy(irc_client_channel_t *channel)
 {
 	mowgli_node_t *n, *tn;
 
-	if (channel != NULL)
+	if (channel == NULL)
 		return -1;
 
 	if (channel->name != NULL)
@@ -145,6 +145,42 @@ int irc_client_channel_destroy(irc_client_channel_t *channel)
 	mowgli_free(channel);
 
 	return 0;
+}
+
+int irc_client_channel_join(irc_client_channel_t *channel, irc_client_peer_t *peer, char prefix)
+{
+	irc_client_channel_user *user;
+
+	if (channel == NULL || peer == NULL)
+		return -1;
+
+	user = irc_client_channel_user_create(peer, prefix);
+	if (user == NULL)
+		return -1;
+
+	mowgli_node_add(user, mowgli_node_create(), channel->users);
+
+	return 0;
+}
+
+int irc_client_channel_part(irc_client_channel_t *channel, irc_client_peer_t *peer)
+{
+	mowgli_node_t *n, *tn;
+
+	if (channel == NULL || peer == NULL)
+		return -1;
+
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, channel->users->head) {
+		if (n->data == peer) {
+			irc_client_channel_user_destroy(n->data);
+			mowgli_node_delete(n, channel->users);
+			mowgli_node_free(n);
+
+			return 0;
+		}
+	}
+
+	return -1;
 }
 
 
@@ -253,25 +289,52 @@ int irc_client_do_nick(irc_client_t *client, char *nick)
 }
 
 
-int irc_client_peer_join(irc_client_t *client, char *peer, char *chan)
+int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 {
-	// fetch channel, bail if doesn't exist
-	// fetch peer object, create if doesn't exist
-	// add peer object to channel
+	irc_client_channel_t *channel;
+	irc_client_peer_t *peer;
+
+	channel = mowgli_patricia_retrieve(client->channels, chan);
+	if (channel == NULL)
+		return -1;
+
+	peer = mowgli_patricia_retrieve(client->peers, nick);
+	if (peer == NULL) {
+		peer = irc_client_peer_create(peer);
+		mowgli_patricia_add(client->peers, nick, peer);
+	}
+
+	return irc_client_channel_join(channel, peer);
 }
 
-int irc_client_peer_part(irc_client_t *client, char *peer, char *chan)
+int irc_client_peer_part(irc_client_t *client, char *nick, char *chan)
 {
-	// fetch channel, bail if doesn't exist
-	// fetch peer object, bail if doesn't exist
-	// remove peer from channel	
-	// free peer if this is their last channel
+	irc_client_channel_t *channel;
+	irc_client_peer_t *peer;
+
+	channel = mowgli_patricia_retrieve(client->channels, chan);
+	peer = mowgli_patricia_retrieve(client->peers, nick);
+
+	// irc_client_channel_part will perform this check for us.
+	// yeah, it's a rather pointless optimization...
+	//if (channel == NULL || peer == NULL)
+	//	return -1;
+
+	return irc_client_channel_part(channel, peer);
 }
 
-int irc_client_peer_nick(irc_client_t *client, char *peer, char *nick)
+int irc_client_peer_nick(irc_client_t *client, char *oldnick, char *newnick)
 {
-	// fetch peer object, bail if doesn't exist
-	// change peer nick
+	irc_client_peer_t *peer;
+
+	peer = mowgli_patricia_retrieve(client->peers, oldnick);
+	if (peer == NULL || peer->nick == NULL)
+		return -1;
+
+	peer->nick->reset(peer->nick);
+	peer->nick->append(peer->nick, newnick, strlen(newnick));
+
+	return 0;
 }
 
 
