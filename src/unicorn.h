@@ -74,9 +74,10 @@ extern void irc_nick_canonize_strict_rfc1459(char *nick);
 
 /* src/isupport.c */
 
-#define IRC_ISUPPORT_CASEMAPPING_ASCII 0
-#define IRC_ISUPPORT_CASEMAPPING_RFC1459 1
-#define IRC_ISUPPORT_CASEMAPPING_STRICT_RFC1459 2
+#define IRC_ISUPPORT_CASEMAPPING_UNKNOWN 0
+#define IRC_ISUPPORT_CASEMAPPING_ASCII 1
+#define IRC_ISUPPORT_CASEMAPPING_RFC1459 2
+#define IRC_ISUPPORT_CASEMAPPING_STRICT_RFC1459 3
 
 struct irc_isupport {
         int casemapping;
