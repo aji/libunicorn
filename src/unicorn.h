@@ -53,10 +53,10 @@ extern int irc_message_format(irc_message_t *msg, mowgli_string_t *str);
 /* src/mode.c */
 
 struct irc_mode_ops {
-        int (*clear)(struct irc_mode_ops_ *ops, char mode);
-        int (*set)(struct irc_mode_ops_ *ops, char mode);
-        int (*clear_arg)(struct irc_mode_ops_ *ops, char mode, char *arg);
-        int (*set_arg)(struct irc_mode_ops_ *ops, char mode, char *arg);
+        int (*clear)(struct irc_mode_ops *ops, char mode);
+        int (*set)(struct irc_mode_ops *ops, char mode);
+        int (*clear_arg)(struct irc_mode_ops *ops, char mode, char *arg);
+        int (*set_arg)(struct irc_mode_ops *ops, char mode, char *arg);
         void *privdata;
 };
 typedef struct irc_mode_ops irc_mode_ops_t;
