@@ -200,7 +200,7 @@ irc_client_t *irc_client_create(void)
 	if (client->nick == NULL)
 		goto fail_nick;
 
-	client->peers = mowgli_patricia_create(NULL);
+	client->peers = mowgli_patricia_create(&irc_nick_canonize_rfc1459);
 	if (client->peers == NULL)
 		goto fail_peers;
 
@@ -245,6 +245,39 @@ int irc_client_destroy(irc_client_t *client)
 	mowgli_free(client);
 
 	return 0;
+}
+
+int irc_client_set_casemapping(irc_client_t *client, int casemapping)
+{
+	void (*canonize_cb)(char *key);
+
+	if (client == NULL)
+		return -1;
+
+	// We will not destroy a non-empty peer list. Sorry :(
+	if (client->peers != NULL && mowgli_patricia_size(client->peers) != 0)
+		return -1;
+
+	canonize_cb = &irc_nick_canonize_rfc1459;
+
+	switch (casemapping) {
+	case IRC_ISUPPORT_CASEMAPPING_ASCII:
+		canonize_cb = &irc_nick_canonize_ascii;
+		break;
+	case IRC_ISUPPORT_CASEMAPPING_RFC1459:
+		canonize_cb = &irc_nick_canonize_rfc1459;
+		break;
+	case IRC_ISUPPORT_CASEMAPPING_STRICT_RFC1459:
+		canonize_cb = &irc_nick_canonize_strict_rfc1459;
+		break;
+	}
+
+	if (client->peers != NULL)
+		mowgli_patricia_destroy(client->peers, NULL, NULL);
+
+	client->peers = mowgli_patricia_create(canonize_cb);
+
+	return (client->peers == NULL) ? -1 : 0;
 }
 
 
@@ -352,6 +385,9 @@ int irc_client_process_message_server(irc_client_t *client, irc_message_t *msg)
 
 	if (!strcmp(msg->command, "005")) {
 		irc_isupport_parse(client->isupport, msg);
+
+		if (client->isupport->casemapping != IRC_ISUPPORT_CASEMAPPING_UNKNOWN)
+			irc_client_set_casemapping(client, client->isupport->casemapping);
 	}
 
 	// TODO: process channel information (names 353 and topic 332/331)
