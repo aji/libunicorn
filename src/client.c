@@ -56,7 +56,7 @@ void irc_client_peer_unref(irc_client_peer_t *peer)
 		irc_client_peer_destroy(peer);
 }
 
-void irc_client_peer_refcnt(irc_client_peer_t *peer)
+int irc_client_peer_refcnt(irc_client_peer_t *peer)
 {
 	return peer->ref;
 }
