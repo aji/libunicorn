@@ -50,20 +50,6 @@ extern int irc_message_parse(irc_message_t *msg, const char *spec);
 extern int irc_message_format(irc_message_t *msg, mowgli_string_t *str);
 
 
-/* src/mode.c */
-
-struct irc_mode_ops {
-        int (*clear)(struct irc_mode_ops *ops, char mode);
-        int (*set)(struct irc_mode_ops *ops, char mode);
-        int (*clear_arg)(struct irc_mode_ops *ops, char mode, char *arg);
-        int (*set_arg)(struct irc_mode_ops *ops, char mode, char *arg);
-        void *privdata;
-};
-typedef struct irc_mode_ops irc_mode_ops_t;
-
-extern int irc_mode_parse(irc_mode_ops_t *ops, char *modespec, char *argmodes, mowgli_node_t *args);
-
-
 /* src/nick.c */
 
 extern void irc_nick_canonize_null(char *nick);
