@@ -56,6 +56,11 @@ void irc_client_peer_unref(irc_client_peer_t *peer)
 		irc_client_peer_destroy(peer);
 }
 
+void irc_client_peer_refcnt(irc_client_peer_t *peer)
+{
+	return peer->ref;
+}
+
 
 // Channel users
 
@@ -334,6 +339,7 @@ int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 	peer = mowgli_patricia_retrieve(client->peers, nick);
 	if (peer == NULL) {
 		peer = irc_client_peer_create(nick);
+		irc_client_peer_ref(peer);
 		mowgli_patricia_add(client->peers, nick, peer);
 	}
 
@@ -348,12 +354,15 @@ int irc_client_peer_part(irc_client_t *client, char *nick, char *chan)
 	channel = mowgli_patricia_retrieve(client->channels, chan);
 	peer = mowgli_patricia_retrieve(client->peers, nick);
 
-	// irc_client_channel_part will perform this check for us.
-	// yeah, it's a rather pointless optimization...
-	//if (channel == NULL || peer == NULL)
-	//	return -1;
+	if (channel == NULL || peer == NULL || irc_client_channel_part(channel, peer) < 0)
+		return -1;
 
-	return irc_client_channel_part(channel, peer);
+	if (irc_client_peer_refcnt(peer) == 1) {
+		irc_client_peer_unref(peer);
+		mowgli_patricia_delete(client->peers, nick);
+	}
+
+	return 0;
 }
 
 int irc_client_peer_nick(irc_client_t *client, char *oldnick, char *newnick)
@@ -366,6 +375,9 @@ int irc_client_peer_nick(irc_client_t *client, char *oldnick, char *newnick)
 
 	peer->nick->reset(peer->nick);
 	peer->nick->append(peer->nick, newnick, strlen(newnick));
+
+	mowgli_patricia_delete(client->peers, oldnick);
+	mowgli_patricia_add(client->peers, newnick, peer);
 
 	return 0;
 }
