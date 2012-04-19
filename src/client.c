@@ -191,13 +191,10 @@ int irc_client_channel_part(irc_client_channel_t *channel, irc_client_peer_t *pe
 
 // Client
 
-irc_client_t *irc_client_create(void)
+int irc_client_init(irc_client_t *client)
 {
-	irc_client_t *client;
-
-	client = mowgli_alloc(sizeof(*client));
 	if (client == NULL)
-		goto fail_alloc;
+		return -1;
 
 	memset(client, 0, sizeof(*client));
 
@@ -213,7 +210,7 @@ irc_client_t *irc_client_create(void)
 	if (client->channels == NULL)
 		goto fail_channels;
 
-	return client;
+	return 0;
 
 
 fail_channels:
@@ -221,9 +218,23 @@ fail_channels:
 fail_peers:
 	mowgli_string_destroy(client->nick);
 fail_nick:
-	mowgli_free(client);
-fail_alloc:
-	return NULL;
+	return -1;
+}
+
+irc_client_t *irc_client_create(void)
+{
+	irc_client_t *client;
+
+	client = mowgli_alloc(sizeof(*client));
+	if (client == NULL)
+		return NULL;
+
+	if (irc_client_init(client) < 0) {
+		mowgli_free(client);
+		return NULL;
+	}
+
+	return client;
 }
 
 void irc_client_deinit_peers_cb(const char *key, void *data, void *unused)
@@ -235,7 +246,7 @@ void irc_client_deinit_channels_cb(const char *key, void *data, void *unused)
 	irc_client_channel_destroy(data);
 }
 
-int irc_client_destroy(irc_client_t *client)
+int irc_client_deinit(irc_client_t *client)
 {
 	if (client == NULL)
 		return -1;
@@ -246,6 +257,14 @@ int irc_client_destroy(irc_client_t *client)
 		mowgli_patricia_destroy(client->peers, irc_client_deinit_peers_cb, NULL);
 	if (client->channels != NULL)
 		mowgli_patricia_destroy(client->channels, irc_client_deinit_channels_cb, NULL);
+
+	return 0;
+}
+
+int irc_client_destroy(irc_client_t *client)
+{
+	if (irc_client_deinit(client) < 0)
+		return -1;
 
 	mowgli_free(client);
 
@@ -326,6 +345,14 @@ int irc_client_do_nick(irc_client_t *client, char *nick)
 	return 0;
 }
 
+int irc_client_do_quit(irc_client_t *client)
+{
+	if (irc_client_deinit(client) < 0)
+		return -1;
+
+	return irc_client_init(client);
+}
+
 
 int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 {
@@ -365,9 +392,10 @@ int irc_client_peer_part(irc_client_t *client, char *nick, char *chan)
 	return 0;
 }
 
-void irc_client_peer_quit_foreach(const char *key, void *data, void *privdata)
+int irc_client_peer_quit_foreach(const char *key, void *data, void *privdata)
 {
 	irc_client_channel_part(data, privdata);
+	return 0;
 }
 int irc_client_peer_quit(irc_client_t *client, char *nick)
 {
@@ -443,6 +471,8 @@ int irc_client_process_message_self(irc_client_t *client, irc_message_t *msg)
 		return irc_client_do_part(client, first_arg);
 	} else if (!strcmp(msg->command, "KICK")) {
 		return irc_client_do_part(client, first_arg);
+	} else if (!strcmp(msg->command, "QUIT")) {
+		return irc_client_do_quit(client);
 	}
 
 	else if (!strcmp(msg->command, "NICK")) {
