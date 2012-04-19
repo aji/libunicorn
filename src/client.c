@@ -420,6 +420,8 @@ int irc_client_process_message_self(irc_client_t *client, irc_message_t *msg)
 		return irc_client_do_join(client, first_arg);
 	} else if (!strcmp(msg->command, "PART")) {
 		return irc_client_do_part(client, first_arg);
+	} else if (!strcmp(msg->command, "KICK")) {
+		return irc_client_do_part(client, first_arg);
 	}
 
 	else if (!strcmp(msg->command, "NICK")) {
@@ -439,6 +441,8 @@ int irc_client_process_message_peer(irc_client_t *client, irc_message_t *msg)
 	if (!strcmp(msg->command, "JOIN")) {
 		return irc_client_peer_join(client, peer, first_arg);
 	} else if (!strcmp(msg->command, "PART")) {
+		return irc_client_peer_part(client, peer, first_arg);
+	} else if (!strcmp(msg->command, "KICK")) {
 		return irc_client_peer_part(client, peer, first_arg);
 	}
 
