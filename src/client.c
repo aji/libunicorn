@@ -365,6 +365,27 @@ int irc_client_peer_part(irc_client_t *client, char *nick, char *chan)
 	return 0;
 }
 
+void irc_client_peer_quit_foreach(const char *key, void *data, void *privdata)
+{
+	irc_client_channel_part(data, privdata);
+}
+int irc_client_peer_quit(irc_client_t *client, char *nick)
+{
+	irc_client_peer_t *peer;
+
+	peer = mowgli_patricia_retrieve(client->peers, nick);
+
+	if (peer == NULL)
+		return -1;
+
+	mowgli_patricia_foreach(client->channels, &irc_client_peer_quit_foreach, peer);
+
+	irc_client_peer_unref(peer);
+	mowgli_patricia_delete(client->peers, nick);
+
+	return 0;
+}
+
 int irc_client_peer_nick(irc_client_t *client, char *oldnick, char *newnick)
 {
 	irc_client_peer_t *peer;
@@ -444,6 +465,8 @@ int irc_client_process_message_peer(irc_client_t *client, irc_message_t *msg)
 		return irc_client_peer_part(client, peer, first_arg);
 	} else if (!strcmp(msg->command, "KICK")) {
 		return irc_client_peer_part(client, peer, first_arg);
+	} else if (!strcmp(msg->command, "QUIT")) {
+		return irc_client_peer_quit(client, peer);
 	}
 
 	else if (!strcmp(msg->command, "NICK")) {
