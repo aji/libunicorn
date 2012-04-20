@@ -24,6 +24,8 @@ void irc_nick_canonize_rfc1459(char *nick)
 		case '|': *nick = '\\'; break;
 		case '^': *nick = '~'; break;
 		}
+
+		nick++;
 	}
 }
 
