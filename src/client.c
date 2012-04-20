@@ -295,14 +295,22 @@ int irc_client_set_casemapping(irc_client_t *client, int casemapping)
 
 	switch (casemapping) {
 	case IRC_ISUPPORT_CASEMAPPING_ASCII:
+		irc_log_debug("client: using 'ascii' casemapping\n");
 		canonize_cb = &irc_nick_canonize_ascii;
 		break;
+
 	case IRC_ISUPPORT_CASEMAPPING_RFC1459:
+		irc_log_debug("client: using 'rfc1459' casemapping\n");
 		canonize_cb = &irc_nick_canonize_rfc1459;
 		break;
+
 	case IRC_ISUPPORT_CASEMAPPING_STRICT_RFC1459:
+		irc_log_debug("client: using 'strict-rfc1459' casemapping\n");
 		canonize_cb = &irc_nick_canonize_strict_rfc1459;
 		break;
+
+	default:
+		irc_log_debug("client: unknown casemapping, using 'rfc1459'\n");
 	}
 
 	if (client->peers != NULL)
@@ -319,6 +327,8 @@ int irc_client_set_casemapping(irc_client_t *client, int casemapping)
 int irc_client_do_join(irc_client_t *client, char *chan)
 {
 	irc_client_channel_t *channel;
+
+	irc_log_info("client: join channel %s\n", chan);
 
 	channel = mowgli_patricia_retrieve(client->channels, chan);
 	if (channel != NULL)
@@ -337,6 +347,8 @@ int irc_client_do_part(irc_client_t *client, char *chan)
 {
 	irc_client_channel_t *channel;
 
+	irc_log_info("client: leaving channel %s\n", chan);
+
 	channel = mowgli_patricia_retrieve(client->channels, chan);
 	if (channel == NULL)
 		return -1;
@@ -351,11 +363,15 @@ int irc_client_do_nick(irc_client_t *client, char *nick)
 	client->nick->reset(client->nick);
 	client->nick->append(client->nick, nick, strlen(nick));
 
+	irc_log_info("client: changed nickname to %s\n", nick);
+
 	return 0;
 }
 
 int irc_client_do_quit(irc_client_t *client)
 {
+	irc_log_info("client: quitting\n");
+
 	if (irc_client_deinit(client) < 0)
 		return -1;
 
@@ -367,6 +383,8 @@ int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 {
 	irc_client_channel_t *channel;
 	irc_client_peer_t *peer;
+
+	irc_log_info("client: add peer %s to %s\n", nick, chan);
 
 	channel = mowgli_patricia_retrieve(client->channels, chan);
 	if (channel == NULL)
@@ -386,6 +404,8 @@ int irc_client_peer_part(irc_client_t *client, char *nick, char *chan)
 {
 	irc_client_channel_t *channel;
 	irc_client_peer_t *peer;
+
+	irc_log_info("client: remove peer %s from %s\n", nick, chan);
 
 	channel = mowgli_patricia_retrieve(client->channels, chan);
 	peer = mowgli_patricia_retrieve(client->peers, nick);
@@ -426,6 +446,8 @@ int irc_client_peer_quit(irc_client_t *client, char *nick)
 int irc_client_peer_nick(irc_client_t *client, char *oldnick, char *newnick)
 {
 	irc_client_peer_t *peer;
+
+	irc_log_info("client: peer %s is now known as %s\n", oldnick, newnick);
 
 	peer = mowgli_patricia_retrieve(client->peers, oldnick);
 	if (peer == NULL || peer->nick == NULL)
