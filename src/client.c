@@ -64,7 +64,7 @@ int irc_client_peer_refcnt(irc_client_peer_t *peer)
 
 // Channel users
 
-irc_client_channel_user_t *irc_client_channel_user_create(irc_client_peer_t *peer, char prefix)
+irc_client_channel_user_t *irc_client_channel_user_create(irc_client_peer_t *peer)
 {
 	irc_client_channel_user_t *user;
 
@@ -161,14 +161,14 @@ int irc_client_channel_destroy(irc_client_channel_t *channel)
 	return 0;
 }
 
-int irc_client_channel_join(irc_client_channel_t *channel, irc_client_peer_t *peer, char prefix)
+int irc_client_channel_join(irc_client_channel_t *channel, irc_client_peer_t *peer)
 {
 	irc_client_channel_user_t *user;
 
 	if (channel == NULL || peer == NULL)
 		return -1;
 
-	user = irc_client_channel_user_create(peer, prefix);
+	user = irc_client_channel_user_create(peer)
 	if (user == NULL)
 		return -1;
 
@@ -416,7 +416,7 @@ int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 		mowgli_patricia_add(client->peers, nick, peer);
 	}
 
-	return irc_client_channel_join(channel, peer, ' ');
+	return irc_client_channel_join(channel, peer);
 }
 
 int irc_client_peer_part(irc_client_t *client, char *nick, char *chan)
