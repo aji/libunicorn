@@ -381,6 +381,22 @@ int irc_client_do_quit(irc_client_t *client)
 	return irc_client_init(client);
 }
 
+int irc_client_set_topic(irc_client_t *client, char *chan, char *topic)
+{
+	irc_client_channel_t *channel;
+
+	irc_log_info("client: setting %s topic to '%s'\n", chan, topic);
+
+	channel = mowgli_patricia_retrieve(client->channels, chan);
+	if (channel == NULL)
+		return -1;
+
+	channel->topic->reset(channel->topic);
+	channel->topic->append(channel->topic, topic, strlen(topic));
+
+	return 0;
+}
+
 
 int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 {
@@ -488,25 +504,64 @@ int irc_client_message_is_me(irc_client_t *client, irc_message_t *msg)
 	return strcmp(na, nb) == 0;
 }
 
+
+int irc_client_process_names(irc_client_t *client, irc_message_t *msg)
+{
+	char *chan, *names, *p, *save;
+
+	if (msg->args.count != 4)
+		return -1;
+
+	chan = msg->args.head->next->next->data;
+	names = msg->args.tail->data;
+
+	irc_log_info("client: processing name list for %s\n", chan);
+
+	p = strtok_r(names, " ", &save);
+	while (p != NULL) {
+		irc_log_debug("  %s\n", p);
+		p = strtok_r(NULL, " ", &save);
+	}
+
+	return 0;
+}
+
 int irc_client_process_message_server(irc_client_t *client, irc_message_t *msg)
 {
 	char *my_nick = NULL;
+	int numeric = 0;
+	char *first_num_arg = NULL;
+	char *last_arg = NULL;
+	
+	if (msg->args.count > 1)
+		first_num_arg = (char*)msg->args.head->next->data;
+	if (msg->args.count > 0)
+		last_arg = (char*)msg->args.tail->data;
 
 	if (strlen(msg->command) == 3 && isdigit(msg->command[0]) &&
 				isdigit(msg->command[1]) && isdigit(msg->command[2])) {
 		// snag the nickname from numerics
 		my_nick = (char*)msg->args.head->data;
+		numeric = atoi(msg->command);
 	}
 
-	if (client->isupport != NULL && !strcmp(msg->command, "005")) {
+
+	if (client->isupport != NULL && numeric == 5) {
 		irc_isupport_parse(client->isupport, msg);
 
 		if (client->isupport->casemapping != IRC_ISUPPORT_CASEMAPPING_UNKNOWN)
 			irc_client_set_casemapping(client, client->isupport->casemapping);
 	}
 
-	// TODO: process channel information (names 353 and topic 332/331)
 
+	if (numeric == 331) {
+		irc_client_set_topic(client, first_num_arg, "");
+	} else if (numeric == 332) {
+		irc_client_set_topic(client, first_num_arg, last_arg);
+	} else if (numeric == 353) {
+		irc_client_process_names(client, msg);
+	}
+		
 	if (my_nick != NULL && strcmp(my_nick, client->nick->str) != 0)
 		return irc_client_do_nick(client, my_nick);
 
