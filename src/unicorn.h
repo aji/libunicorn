@@ -18,6 +18,13 @@
 extern void irc_log_level(int level);
 extern int irc_log(int level, char *fmt, ...);
 
+#define irc_log_debug(F, A...)   irc_log(IRC_LOG_DEBUG, F, A)
+#define irc_log_info(F, A...)    irc_log(IRC_LOG_INFO, F, A)
+#define irc_log_notice(F, A...)  irc_log(IRC_LOG_NOTICE, F, A)
+#define irc_log_warn(F, A...)    irc_log(IRC_LOG_WARN, F, A)
+#define irc_log_error(F, A...)   irc_log(IRC_LOG_ERROR, F, A)
+#define irc_log_fatal(F, A...)   irc_log(IRC_LOG_FATAL, F, A)
+
 
 /* src/message.c */
 
