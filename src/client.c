@@ -72,9 +72,15 @@ irc_client_channel_user_t *irc_client_channel_user_create(irc_client_peer_t *pee
 	if (user == NULL)
 		return NULL;
 
-	user->peer = peer;
-	user->prefix = prefix;
+	// TODO: snag this from client->isupport
+	user->prefix = irc_prefix_create(NULL);
 
+	if (user->prefix == NULL) {
+		mowgli_free(user);
+		return NULL;
+	}
+
+	user->peer = peer;
 	irc_client_peer_ref(user->peer);
 
 	return user;
@@ -84,6 +90,9 @@ int irc_client_channel_user_destroy(irc_client_channel_user_t *user)
 {
 	if (user == NULL)
 		return -1;
+
+	if (user->prefix != NULL)
+		irc_prefix_destroy(user->prefix);
 
 	irc_client_peer_unref(user->peer);
 

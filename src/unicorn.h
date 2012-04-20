@@ -123,7 +123,7 @@ struct irc_client_peer {
 };
 struct irc_client_channel_user {
 	struct irc_client_peer *peer;
-	char prefix;
+	irc_prefix_t *prefix;
 };
 struct irc_client_channel {
 	mowgli_string_t *name;
