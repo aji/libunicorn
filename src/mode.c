@@ -28,25 +28,6 @@ int irc_prefix_destroy(irc_prefix_t *pfx)
 }
 
 
-char *irc_prefix_isupport_mode(irc_prefix_t *pfx)
-{
-	if (pfx->isupport == NULL || pfx->isupport->prefix.mode == NULL
-			|| pfx->isupport->prefix.mode->str == NULL)
-		return "ov";
-
-	return pfx->isupport->prefix.mode->str;
-}
-
-char *irc_prefix_isupport_prefix(irc_prefix_t *pfx)
-{
-	if (pfx->isupport == NULL || pfx->isupport->prefix.prefix == NULL
-			|| pfx->isupport->prefix.prefix->str == NULL)
-		return "@+";
-
-	return pfx->isupport->prefix.prefix->str;
-}
-
-
 int irc_prefix_set(irc_prefix_t *pfx, char mode)
 {
 	char *p, *q;
@@ -56,7 +37,7 @@ int irc_prefix_set(irc_prefix_t *pfx, char mode)
 	if (pfx == NULL)
 		return -1;
 
-	p = irc_prefix_isupport_mode(pfx);
+	p = irc_isupport_get_prefix_mode(pfx->isupport);
 	q = strchr(p, mode);
 
 	if (q == NULL)
@@ -76,7 +57,7 @@ int irc_prefix_clear(irc_prefix_t *pfx, char mode)
 	if (pfx == NULL)
 		return -1;
 
-	p = irc_prefix_isupport_mode(pfx);
+	p = irc_isupport_get_prefix_mode(pfx->isupport);
 	q = strchr(p, mode);
 
 	if (q == NULL)
@@ -96,7 +77,7 @@ char irc_prefix_char(irc_prefix_t *pfx)
 	if (pfx == NULL)
 		return ' ';
 
-	p = irc_prefix_isupport_prefix(pfx);
+	p = irc_isupport_get_prefix_char(pfx);
 
 	n = strlen(p);
 	if (n > (sizeof(pfx->bv) << 3))

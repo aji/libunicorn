@@ -169,3 +169,23 @@ int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg)
 
 	return 0;
 }
+
+
+char *irc_isupport_get_prefix_mode(irc_isupport_t *isupport)
+{
+	if (isupport == NULL || isupport->prefix.mode == NULL
+			|| isupport->prefix.mode->str == NULL)
+		return "ov";
+
+	return isupport->prefix.mode->str;
+}
+
+char *irc_isupport_get_prefix_char(irc_isupport_t *isupport)
+{
+	if (isupport == NULL || isupport->prefix.prefix == NULL
+			|| isupport->prefix.prefix->str == NULL)
+		return "@+";
+
+	return isupport->prefix.prefix->str;
+}
+
