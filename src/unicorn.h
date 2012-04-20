@@ -6,6 +6,19 @@
 #include <mowgli.h>
 
 
+/* src/log.c */
+
+#define IRC_LOG_DEBUG   0
+#define IRC_LOG_INFO    1
+#define IRC_LOG_NOTICE  2
+#define IRC_LOG_WARN    3
+#define IRC_LOG_ERROR   4
+#define IRC_LOG_FATAL   5
+
+extern void irc_log_level(int level);
+extern int irc_log(int level, char *fmt, ...);
+
+
 /* src/message.c */
 
 #define IRC_MESSAGE_SOURCE_NONE   0

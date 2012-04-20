@@ -5,7 +5,8 @@ SOURCES = isupport.c \
 		message.c \
 		nick.c \
 		mode.c \
-		client.c
+		client.c \
+		log.c
 OBJECTS = ${SOURCES:.c=.o}
 
 compile:
