@@ -475,7 +475,7 @@ int irc_client_process_message_server(irc_client_t *client, irc_message_t *msg)
 		my_nick = (char*)msg->args.head->data;
 	}
 
-	if (!strcmp(msg->command, "005")) {
+	if (client->isupport != NULL && !strcmp(msg->command, "005")) {
 		irc_isupport_parse(client->isupport, msg);
 
 		if (client->isupport->casemapping != IRC_ISUPPORT_CASEMAPPING_UNKNOWN)
