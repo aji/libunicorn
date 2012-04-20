@@ -77,7 +77,7 @@ char irc_prefix_char(irc_prefix_t *pfx)
 	if (pfx == NULL)
 		return ' ';
 
-	p = irc_isupport_get_prefix_char(pfx);
+	p = irc_isupport_get_prefix_char(pfx->isupport);
 
 	n = strlen(p);
 	if (n > (sizeof(pfx->bv) << 3))

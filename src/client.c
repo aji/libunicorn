@@ -161,16 +161,19 @@ int irc_client_channel_destroy(irc_client_channel_t *channel)
 	return 0;
 }
 
-int irc_client_channel_join(irc_client_channel_t *channel, irc_client_peer_t *peer)
+int irc_client_channel_join(irc_client_channel_t *channel, irc_client_peer_t *peer, char mode)
 {
 	irc_client_channel_user_t *user;
 
 	if (channel == NULL || peer == NULL)
 		return -1;
 
-	user = irc_client_channel_user_create(peer)
+	user = irc_client_channel_user_create(peer);
 	if (user == NULL)
 		return -1;
+
+	if (mode != ' ')
+		irc_prefix_set(user->prefix, mode);
 
 	mowgli_node_add(user, mowgli_node_create(), channel->users);
 
@@ -398,8 +401,10 @@ int irc_client_set_topic(irc_client_t *client, char *chan, char *topic)
 }
 
 
+// if nick is prefixed by a single prefix char then it is used as the initial prefix
 int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 {
+	char *p, *q;
 	irc_client_channel_t *channel;
 	irc_client_peer_t *peer;
 
@@ -409,6 +414,14 @@ int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 	if (channel == NULL)
 		return -1;
 
+	p = irc_isupport_get_prefix_char(client->isupport);
+	if ((q = strchr(p, *nick)) != NULL) {
+		p = irc_isupport_get_prefix_mode(client->isupport) + (q - p);
+		nick++;
+	} else {
+		p = " ";
+	}
+
 	peer = mowgli_patricia_retrieve(client->peers, nick);
 	if (peer == NULL) {
 		peer = irc_client_peer_create(nick);
@@ -416,7 +429,7 @@ int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 		mowgli_patricia_add(client->peers, nick, peer);
 	}
 
-	return irc_client_channel_join(channel, peer);
+	return irc_client_channel_join(channel, peer, *p);
 }
 
 int irc_client_peer_part(irc_client_t *client, char *nick, char *chan)
@@ -519,7 +532,7 @@ int irc_client_process_names(irc_client_t *client, irc_message_t *msg)
 
 	p = strtok_r(names, " ", &save);
 	while (p != NULL) {
-		irc_log_debug("  %s\n", p);
+		irc_client_peer_join(client, p, chan);
 		p = strtok_r(NULL, " ", &save);
 	}
 
