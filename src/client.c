@@ -219,6 +219,8 @@ int irc_client_init(irc_client_t *client)
 	if (client->channels == NULL)
 		goto fail_channels;
 
+	client->casemap = &irc_nick_canonize_rfc1459;
+
 	return 0;
 
 
@@ -317,6 +319,7 @@ int irc_client_set_casemapping(irc_client_t *client, int casemapping)
 		mowgli_patricia_destroy(client->peers, NULL, NULL);
 
 	client->peers = mowgli_patricia_create(canonize_cb);
+	client->casemap = canonize_cb;
 
 	return (client->peers == NULL) ? -1 : 0;
 }
@@ -465,6 +468,26 @@ int irc_client_peer_nick(irc_client_t *client, char *oldnick, char *newnick)
 
 // Client message processing
 
+int irc_client_message_is_me(irc_client_t *client, irc_message_t *msg)
+{
+	char na[51], nb[51];
+
+	if (client == NULL || client->nick == NULL
+			|| msg->source.type != IRC_MESSAGE_SOURCE_USER
+			|| msg->source.user.nick == NULL)
+		return 0;
+
+	mowgli_strlcpy(na, client->nick->str, 51);
+	mowgli_strlcpy(nb, msg->source.user.nick, 51);
+
+	if (client->casemap != NULL) {
+		client->casemap(na);
+		client->casemap(nb);
+	}
+
+	return strcmp(na, nb) == 0;
+}
+
 int irc_client_process_message_server(irc_client_t *client, irc_message_t *msg)
 {
 	char *my_nick = NULL;
@@ -550,7 +573,7 @@ int irc_client_process_message(irc_client_t *client, irc_message_t *msg)
 		break;
 
 	case IRC_MESSAGE_SOURCE_USER:
-		if (client->nick_cmp(client->nick->str, msg->source.user.nick) == 0) {
+		if (irc_client_message_is_me(client, msg)) {
 			return irc_client_process_message_self(client, msg);
 		} else {
 			return irc_client_process_message_peer(client, msg);

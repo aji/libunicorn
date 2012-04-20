@@ -157,7 +157,7 @@ struct irc_client {
 
 	irc_isupport_t *isupport;
 
-	int (*nick_cmp)(char*, char*);
+	void (*casemap)(char*);
 };
 typedef struct irc_client_peer irc_client_peer_t;
 typedef struct irc_client_channel_user irc_client_channel_user_t;
@@ -166,6 +166,7 @@ typedef struct irc_client irc_client_t;
 
 extern int irc_client_init(irc_client_t *client);
 extern irc_client_t *irc_client_create(void);
+extern int irc_client_message_is_me(irc_client_t *client, irc_message_t *msg);
 extern int irc_client_process_message(irc_client_t *client, irc_message_t *msg);
 
 
