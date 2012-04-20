@@ -142,7 +142,7 @@ extern char irc_prefix_char(irc_prefix_t *pfx);
 
 struct irc_client_peer {
 	mowgli_string_t *nick;
-	int ref;
+	int channels;
 };
 struct irc_client_channel_user {
 	struct irc_client_peer *peer;

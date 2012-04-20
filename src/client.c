@@ -23,7 +23,7 @@ irc_client_peer_t *irc_client_peer_create(char *nick)
 	peer->nick->reset(peer->nick);
 	peer->nick->append(peer->nick, nick, strlen(nick));
 
-	peer->ref = 0;
+	peer->channels = 0;
 
 	return peer;
 }
@@ -37,28 +37,6 @@ int irc_client_peer_destroy(irc_client_peer_t *peer)
 	mowgli_free(peer);
 
 	return 0;
-}
-
-void irc_client_peer_ref(irc_client_peer_t *peer)
-{
-	if (peer != NULL)
-		peer->ref += 1;
-}
-
-void irc_client_peer_unref(irc_client_peer_t *peer)
-{
-	if (peer == NULL)
-		return;
-
-	peer->ref -= 1;
-
-	if (peer->ref <= 0)
-		irc_client_peer_destroy(peer);
-}
-
-int irc_client_peer_refcnt(irc_client_peer_t *peer)
-{
-	return peer->ref;
 }
 
 
@@ -81,7 +59,8 @@ irc_client_channel_user_t *irc_client_channel_user_create(irc_client_peer_t *pee
 	}
 
 	user->peer = peer;
-	irc_client_peer_ref(user->peer);
+	if (user->peer)
+		user->peer->channels++;
 
 	return user;
 }
@@ -94,7 +73,8 @@ int irc_client_channel_user_destroy(irc_client_channel_user_t *user)
 	if (user->prefix != NULL)
 		irc_prefix_destroy(user->prefix);
 
-	irc_client_peer_unref(user->peer);
+	if (user->peer)
+		user->peer->channels--;
 
 	mowgli_free(user);
 
@@ -253,7 +233,7 @@ irc_client_t *irc_client_create(void)
 
 void irc_client_deinit_peers_cb(const char *key, void *data, void *unused)
 {
-	irc_client_peer_unref(data);
+	irc_client_peer_destroy(data);
 }
 void irc_client_deinit_channels_cb(const char *key, void *data, void *unused)
 {
@@ -327,6 +307,42 @@ int irc_client_set_casemapping(irc_client_t *client, int casemapping)
 	return (client->peers == NULL) ? -1 : 0;
 }
 
+int irc_client_prune_peers_foreach(const char *key, void *data, void *privdata)
+{
+	irc_client_peer_t *peer = data;
+	mowgli_list_t *deletions = privdata;
+
+	if (peer->channels == 0) {
+		irc_log_debug("client: lost track of %s\n", peer->nick->str);
+
+		irc_client_peer_destroy(peer);
+		mowgli_node_add((void*)key, mowgli_node_create(), deletions);
+	}
+
+	return 0;
+}
+int irc_client_prune_peers(irc_client_t *client)
+{
+	mowgli_list_t *deletions;
+	mowgli_node_t *n, *tn;
+
+	if (client == NULL)
+		return -1;
+
+	deletions = mowgli_list_create();
+
+	mowgli_patricia_foreach(client->peers, &irc_client_prune_peers_foreach, deletions);
+
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, deletions->head) {
+		mowgli_patricia_delete(client->peers, n->data);
+		mowgli_node_free(n);
+	}
+
+	mowgli_list_free(deletions);
+
+	return 0;
+}
+
 
 // Client Actions
 
@@ -361,7 +377,12 @@ int irc_client_do_part(irc_client_t *client, char *chan)
 
 	mowgli_patricia_delete(client->channels, chan);
 
-	return irc_client_channel_destroy(channel);
+	if (irc_client_channel_destroy(channel) < 0)
+		return -1;
+
+	irc_client_prune_peers(client);
+
+	return 0;
 }
 
 int irc_client_do_nick(irc_client_t *client, char *nick)
@@ -425,7 +446,6 @@ int irc_client_peer_join(irc_client_t *client, char *nick, char *chan)
 	peer = mowgli_patricia_retrieve(client->peers, nick);
 	if (peer == NULL) {
 		peer = irc_client_peer_create(nick);
-		irc_client_peer_ref(peer);
 		mowgli_patricia_add(client->peers, nick, peer);
 	}
 
@@ -445,8 +465,8 @@ int irc_client_peer_part(irc_client_t *client, char *nick, char *chan)
 	if (channel == NULL || peer == NULL || irc_client_channel_part(channel, peer) < 0)
 		return -1;
 
-	if (irc_client_peer_refcnt(peer) == 1) {
-		irc_client_peer_unref(peer);
+	if (peer->channels == 0) {
+		irc_client_peer_destroy(peer);
 		mowgli_patricia_delete(client->peers, nick);
 	}
 
@@ -469,7 +489,6 @@ int irc_client_peer_quit(irc_client_t *client, char *nick)
 
 	mowgli_patricia_foreach(client->channels, &irc_client_peer_quit_foreach, peer);
 
-	irc_client_peer_unref(peer);
 	mowgli_patricia_delete(client->peers, nick);
 
 	return 0;
