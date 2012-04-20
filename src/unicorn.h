@@ -93,6 +93,28 @@ typedef struct irc_isupport irc_isupport_t;
 extern int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg);
 
 
+/* src/mode.c */
+
+struct irc_prefix {
+	// While theoretically you could have more than 32 prefixes,
+	// in practice you typically see no more than 5.
+	unsigned long bv;
+
+	// if this is NULL, the standard PREFIX=(ov)@+ applies
+	irc_isupport_t *isupport;
+};
+typedef struct irc_prefix irc_prefix_t;
+
+extern irc_prefix_t *irc_prefix_create(irc_isupport_t *isupport);
+extern int irc_prefix_destroy(irc_prefix_t *pfx);
+
+extern int irc_prefix_set(irc_prefix_t *pfx, char mode);
+extern int irc_prefix_clear(irc_prefix_t *pfx, char mode);
+
+// will return ASCII space if no prefixes are set
+extern char irc_prefix_char(irc_prefix_t *pfx);
+
+
 /* src/client.c */
 
 struct irc_client_peer {
