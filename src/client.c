@@ -163,13 +163,16 @@ int irc_client_channel_join(irc_client_channel_t *channel, irc_client_peer_t *pe
 int irc_client_channel_part(irc_client_channel_t *channel, irc_client_peer_t *peer)
 {
 	mowgli_node_t *n, *tn;
+	irc_client_channel_user_t *user;
 
 	if (channel == NULL || peer == NULL)
 		return -1;
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, channel->users->head) {
-		if (n->data == peer) {
-			irc_client_channel_user_destroy(n->data);
+		user = n->data;
+
+		if (user->peer == peer) {
+			irc_client_channel_user_destroy(user);
 			mowgli_node_delete(n, channel->users);
 			mowgli_node_free(n);
 
