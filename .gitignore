@@ -1,9 +1,17 @@
 test/
 *.o
+*.so
 
 autom4te.cache/
+.deps
+*.dep
+aclocal.m4
 configure
 config.log
 config.status
-configure.mk
+buildsys.mk
+extra.mk
 libchat.pc
+
+*.swp
+*~

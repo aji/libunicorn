@@ -1,0 +1,2 @@
+libmowgli_2_LIBS = @libmowgli_2_LIBS@
+libmowgli_2_CFLAGS = @libmowgli_2_CFLAGS@
