@@ -1,6 +1,6 @@
 #include <mowgli.h>
 #include <ctype.h>
-#include "chat.h"
+#include "unicorn.h"
 
 
 irc_hook_t *irc_hook_create(irc_hook_cb_t *cb, void *priv)

@@ -3,10 +3,10 @@ include ../extra.mk
 LIB_MAJOR = 0
 LIB_MINOR = 1
 
-SHARED_LIB = libchat.so
+SHARED_LIB = libunicorn.so
 STATIC_LIB =
 
-INCLUDES = chat.h
+INCLUDES = unicorn.h
 
 SRCS = hook.c \
 	isupport.c \

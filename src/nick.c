@@ -1,5 +1,5 @@
 #include <ctype.h>
-#include "chat.h"
+#include "unicorn.h"
 
 void irc_nick_canonize_null(char *nick)
 {

@@ -2,7 +2,7 @@ dnl  To generate the configure script, call:
 dnl    aclocal -I m4
 dnl    autoconf
 
-AC_INIT([libchat], [0.1], [https://github.com/aji/libchat/issues])
+AC_INIT([libunicorn], [0.1], [https://github.com/aji/libunicorn/issues])
 AC_CONFIG_SRCDIR(src)
 
 AC_PROG_CC
@@ -17,6 +17,6 @@ BUILDSYS_SHARED_LIB
 BUILDSYS_INIT
 BUILDSYS_TOUCH_DEPS
 
-AC_CONFIG_FILES([buildsys.mk extra.mk libchat.pc])
+AC_CONFIG_FILES([buildsys.mk extra.mk libunicorn.pc])
 
 AC_OUTPUT
