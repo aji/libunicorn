@@ -110,3 +110,30 @@ int irc_hook_call(irc_hook_table_t *table, char *hook, int parc, char *parv[])
 	return 0;
 }
 
+
+int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg)
+{
+	mowgli_node_t *n;
+	int parc, i;
+	char **parv;
+
+	parc = msg->args.count + 1;
+	parv = mowgli_alloc_array(sizeof(char*), parc);
+
+	if (msg->source.type == IRC_MESSAGE_SOURCE_NONE)
+		parv[0] = "";
+	else
+		parv[0] = msg->source.user.nick;
+
+	i = 1;
+	MOWGLI_LIST_FOREACH(n, msg->args.head) {
+		parv[i] = n->data;
+		i++;
+	}
+
+	i = irc_hook_call(table, msg->command, parc, parv);
+
+	mowgli_free(parv);
+
+	return i;
+}

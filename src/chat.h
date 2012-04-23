@@ -197,5 +197,20 @@ extern int irc_hook_add(irc_hook_table_t *table, char *hook, irc_hook_cb_t *cb, 
 
 extern int irc_hook_call(irc_hook_table_t *table, char *hook, int parc, char *parv[]);
 
+// This function will take a message and call a particular hook based on
+// a simple transformation. The hook to be called is simply the message
+// command. The first argument is the sender's nick (or "" if there is
+// no sender), and the following arguments are simply the arguments to
+// the message.
+//
+// Examples:
+//   ":aji!alex@asu.edu JOIN #lobby"
+//       calls "JOIN" with arguments "aji", "#lobby"
+//   "PING :t4.general.asu.edu"
+//       calls "PING" with arguments "", "t4.general.asu.edu"
+//   ":aji!alex@asu.edu PRIVMSG #lobby :hi"
+//       calls "PRIVMSG" with arguments "aji", "#lobby", "hi"
+extern int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg);
+
 
 #endif
