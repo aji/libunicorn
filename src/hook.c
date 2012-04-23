@@ -57,14 +57,14 @@ irc_hook_table_t *irc_hook_table_create()
 
 int irc_hook_table_destroy(irc_hook_table_t *table)
 {
-	mowgli_patricia_iteration_state_t *state;
+	mowgli_patricia_iteration_state_t state;
 	irc_hook_t *hook;
 
-	mowgli_patricia_foreach_start(table->hooks, state);
+	mowgli_patricia_foreach_start(table->hooks, &state);
 
-	while ((hook = mowgli_patricia_foreach_cur(table->hooks, state)) != NULL) {
+	while ((hook = mowgli_patricia_foreach_cur(table->hooks, &state)) != NULL) {
 		irc_hook_destroy_all(hook);
-		mowgli_patricia_foreach_next(table->hooks, state);
+		mowgli_patricia_foreach_next(table->hooks, &state);
 	}
 
 	mowgli_free(table);

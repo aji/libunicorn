@@ -177,7 +177,7 @@ extern int irc_client_process_message(irc_client_t *client, irc_message_t *msg);
 
 // NOTE: hooks are case-insensitive
 
-typedef (irc_hook_cb_t)(int parc, char *parv[], void *);
+typedef void (irc_hook_cb_t)(int parc, char *parv[], void *priv);
 
 struct irc_hook {
 	irc_hook_cb_t *cb;
