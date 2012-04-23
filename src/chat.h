@@ -173,4 +173,29 @@ extern int irc_client_message_is_me(irc_client_t *client, irc_message_t *msg);
 extern int irc_client_process_message(irc_client_t *client, irc_message_t *msg);
 
 
+/* src/hook.c */
+
+// NOTE: hooks are case-insensitive
+
+typedef (irc_hook_cb_t)(int parc, char *parv[], void *);
+
+struct irc_hook {
+	irc_hook_cb_t *cb;
+	void *priv;
+	void *next;
+};
+struct irc_hook_table {
+	mowgli_patricia_t *hooks;
+};
+typedef struct irc_hook irc_hook_t;
+typedef struct irc_hook_table irc_hook_table_t;
+
+extern irc_hook_table_t *irc_hook_table_create();
+extern int irc_hook_table_destroy(irc_hook_table_t *table);
+
+extern int irc_hook_add(irc_hook_table_t *table, char *hook, irc_hook_cb_t *cb, void *priv);
+
+extern int irc_hook_call(irc_hook_table_t *table, char *hook, int parc, char *parv[]);
+
+
 #endif

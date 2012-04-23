@@ -6,4 +6,4 @@ configure
 config.log
 config.status
 configure.mk
-libunicorn.pc
+libchat.pc

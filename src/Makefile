@@ -6,6 +6,7 @@ SOURCES = isupport.c \
 		nick.c \
 		mode.c \
 		client.c \
+		hook.c \
 		log.c
 OBJECTS = ${SOURCES:.c=.o}
 
