@@ -12,13 +12,6 @@ in RFC 1459) to and from C strings. In theory, any protocol which uses
 IRC-like messages (i.e. ":sender COMMAND arg arg :long arg") could make
 use of the parsers and formatters in libchat.
 
-In addition to these parsers and formatters, libchat also contains
-a variety of client-oriented capabilities. One such capability is
-mode string parsing. libchat can take a mode string such as "-s+mi"
-and call user-specified callbacks for each set and cleared mode. This
-is a small but frequently neglected feature of many small IRC clients
-(such as poorly-written IRC bots).
-
 # Dependencies
 
 libchat currently depends only on libmowgli-2. Although libchat only
