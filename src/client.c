@@ -1,7 +1,7 @@
 #include <string.h>
 #include <mowgli.h>
 
-#include "unicorn.h"
+#include "chat.h"
 
 
 // Peer
@@ -489,6 +489,8 @@ int irc_client_peer_quit(irc_client_t *client, char *nick)
 
 	if (peer == NULL)
 		return -1;
+
+	irc_log_info("client: peer quit %s\n", nick);
 
 	mowgli_patricia_foreach(client->channels, &irc_client_peer_quit_foreach, peer);
 

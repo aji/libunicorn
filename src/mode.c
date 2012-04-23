@@ -1,7 +1,7 @@
 #include <string.h>
 #include <mowgli.h>
 
-#include "unicorn.h"
+#include "chat.h"
 
 
 irc_prefix_t *irc_prefix_create(irc_isupport_t *isupport)

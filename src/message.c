@@ -4,7 +4,7 @@
 #include <ctype.h>
 #include <mowgli.h>
 
-#include "unicorn.h"
+#include "chat.h"
 
 int irc_message_source_parse(irc_message_source_t *source, char *spec)
 {

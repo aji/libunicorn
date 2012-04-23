@@ -1,6 +1,6 @@
 #include <string.h>
 #include <mowgli.h>
-#include "unicorn.h"
+#include "chat.h"
 
 // function naming issue? ... maybe
 void mowgli_string_copy(mowgli_string_t *self, const char *src, size_t n)

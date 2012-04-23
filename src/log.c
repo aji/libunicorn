@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "unicorn.h"
+#include "chat.h"
 
 
 static const char *log_prefix[] =
