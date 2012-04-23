@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: @PACKAGE_NAME@
-Description: An IRC client library
+Description: The magical IRC client library
 Version: @PACKAGE_VERSION@
 
 Libs: -L${libdir} -lunicorn
