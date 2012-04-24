@@ -6,6 +6,44 @@
 
 #include "unicorn.h"
 
+
+irc_message_t *irc_message_create(void)
+{
+	irc_message_t *msg;
+
+	return mowgli_alloc(sizeof(*msg));
+}
+
+int irc_message_destroy(irc_message_t *msg)
+{
+	mowgli_node_t *n, *tn;
+
+	if (!msg)
+		return -1;
+
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, msg->args.head) {
+		mowgli_node_free(n);
+	}
+
+	return 0;
+}
+
+int irc_message_reset(irc_message_t *msg)
+{
+	mowgli_node_t *n, *tn;
+
+	if (!msg)
+		return -1;
+
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, msg->args.head) {
+		mowgli_list_delete(n, &msg->args);
+		mowgli_node_free(n);
+	}
+
+	return 0;
+}
+
+
 int irc_message_source_parse(irc_message_source_t *source, char *spec)
 {
 	char *at;

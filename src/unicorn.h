@@ -62,6 +62,10 @@ struct irc_message {
 typedef union irc_message_source irc_message_source_t;
 typedef struct irc_message irc_message_t;
 
+extern irc_message_t *irc_message_create();
+extern int irc_message_destroy(irc_message_t *msg);
+extern int irc_message_reset(irc_message_t *msg);
+
 extern int irc_message_source_parse(irc_message_source_t *source, char *spec);
 extern int irc_message_source_format(irc_message_source_t *source, mowgli_string_t *str);
 
