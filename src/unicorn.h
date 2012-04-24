@@ -181,5 +181,13 @@ extern int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, co
 //       calls "PRIVMSG" with arguments "aji", "#lobby", "hi"
 extern int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg);
 
+// This function behaves exactly as irc_hook_simple_dispatch, except it
+// prefixes the string argument onto the hook names. For example if
+// the argument were "client_", then a PRIVMSG would produce a call
+// to client_PRIVMSG. Note that irc_hook_simple_dispatch and
+// irc_hook_prefix dispatch with a prefix of "" produce the exact same
+// effect.
+extern int irc_hook_prefix_dispatch(irc_hook_table_t *table, irc_message_t *msg, const char *prefix);
+
 
 #endif
