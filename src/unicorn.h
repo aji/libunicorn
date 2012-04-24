@@ -142,41 +142,6 @@ extern int irc_prefix_clear(irc_prefix_t *pfx, char mode);
 extern char irc_prefix_char(irc_prefix_t *pfx);
 
 
-/* src/client.c */
-
-struct irc_client_peer {
-	mowgli_string_t *nick;
-	int channels;
-};
-struct irc_client_channel_user {
-	struct irc_client_peer *peer;
-	irc_prefix_t *prefix;
-};
-struct irc_client_channel {
-	mowgli_string_t *name;
-	mowgli_string_t *topic;
-	mowgli_list_t *users;
-};
-struct irc_client {
-	mowgli_string_t *nick;
-	mowgli_patricia_t *peers;
-	mowgli_patricia_t *channels;
-
-	irc_isupport_t *isupport;
-
-	void (*casemap)(char*);
-};
-typedef struct irc_client_peer irc_client_peer_t;
-typedef struct irc_client_channel_user irc_client_channel_user_t;
-typedef struct irc_client_channel irc_client_channel_t;
-typedef struct irc_client irc_client_t;
-
-extern int irc_client_init(irc_client_t *client);
-extern irc_client_t *irc_client_create(void);
-extern int irc_client_message_is_me(irc_client_t *client, irc_message_t *msg);
-extern int irc_client_process_message(irc_client_t *client, irc_message_t *msg);
-
-
 /* src/hook.c */
 
 // NOTE: hooks are case-insensitive
