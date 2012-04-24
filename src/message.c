@@ -1,3 +1,11 @@
+/*
+ * libunicorn -- The magical IRC client library
+ * Copyright (C) 2012 Alex Iadicicco
+ *
+ * This file is part of libunicorn and is protected under the terms
+ * contained in the COPYING file in the project root.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

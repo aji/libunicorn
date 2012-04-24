@@ -12,6 +12,9 @@ in RFC 1459) to and from C strings. In theory, any protocol which uses
 IRC-like messages (i.e. ":sender COMMAND arg arg :long arg") could make
 use of the parsers and formatters in libunicorn.
 
+This project is licensed under the MIT license, contained in the COPYING
+file.
+
 # Dependencies
 
 libunicorn currently depends only on libmowgli-2. Although libunicorn only
