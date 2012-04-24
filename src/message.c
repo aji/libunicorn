@@ -36,9 +36,11 @@ int irc_message_reset(irc_message_t *msg)
 		return -1;
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, msg->args.head) {
-		mowgli_list_delete(n, &msg->args);
+		mowgli_node_delete(n, &msg->args);
 		mowgli_node_free(n);
 	}
+
+	memset(msg, 0, sizeof(*msg));
 
 	return 0;
 }
