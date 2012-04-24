@@ -11,7 +11,7 @@ config.log
 config.status
 buildsys.mk
 extra.mk
-libchat.pc
+libunicorn.pc
 
 *.swp
 *~
