@@ -73,7 +73,7 @@ int irc_hook_table_destroy(irc_hook_table_t *table)
 }
 
 
-int irc_hook_add(irc_hook_table_t *table, char *hook, irc_hook_cb_t *cb, void *priv)
+int irc_hook_add(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb, void *priv)
 {
 	irc_hook_t *newhook, *head;
 
@@ -92,7 +92,7 @@ int irc_hook_add(irc_hook_table_t *table, char *hook, irc_hook_cb_t *cb, void *p
 }
 
 
-int irc_hook_call(irc_hook_table_t *table, char *hook, int parc, char *parv[])
+int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, const char *parv[])
 {
 	irc_hook_t *curr;
 
@@ -131,7 +131,7 @@ int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg)
 		i++;
 	}
 
-	i = irc_hook_call(table, msg->command, parc, parv);
+	i = irc_hook_call(table, msg->command, parc, (const char**)parv);
 
 	mowgli_free(parv);
 

@@ -146,7 +146,7 @@ extern char irc_prefix_char(irc_prefix_t *pfx);
 
 // NOTE: hooks are case-insensitive
 
-typedef void (irc_hook_cb_t)(int parc, char *parv[], void *priv);
+typedef void (irc_hook_cb_t)(int parc, const char *parv[], void *priv);
 
 struct irc_hook {
 	irc_hook_cb_t *cb;
@@ -162,9 +162,9 @@ typedef struct irc_hook_table irc_hook_table_t;
 extern irc_hook_table_t *irc_hook_table_create();
 extern int irc_hook_table_destroy(irc_hook_table_t *table);
 
-extern int irc_hook_add(irc_hook_table_t *table, char *hook, irc_hook_cb_t *cb, void *priv);
+extern int irc_hook_add(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb, void *priv);
 
-extern int irc_hook_call(irc_hook_table_t *table, char *hook, int parc, char *parv[]);
+extern int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, const char *parv[]);
 
 // This function will take a message and call a particular hook based on
 // a simple transformation. The hook to be called is simply the message
