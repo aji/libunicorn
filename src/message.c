@@ -134,8 +134,15 @@ int irc_message_source_format(irc_message_source_t *source, mowgli_string_t *str
 int irc_message_parse_buffer(irc_message_t *msg)
 {
 	char *spec, *at;
+	mowgli_node_t *n, *tn;
 
 	spec = msg->buffer;
+
+	// clear out the argument list
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, msg->args.head) {
+		mowgli_node_delete(n, &msg->args);
+		mowgli_node_free(n);
+	}
 
 	// first the sender, if any
 	if (spec[0] == ':') {
