@@ -2,3 +2,6 @@ New in version 0.2
 
     - The message parser functions now clear out the argument list
       beforehand. Not doing this quickly leads to loads of weird bugs.
+
+    - Hook calling order has been standardized. Hooks are called in the
+      order they were added.
