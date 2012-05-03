@@ -7,6 +7,9 @@ autom4te.cache/
 .deps
 *.dep
 aclocal.m4
+config.guess
+config.sub
+install-sh
 configure
 config.log
 config.status

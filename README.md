@@ -26,3 +26,16 @@ created to be used with applications that will make use of libmowgli-2.
 This library is not very well-documented, but the source is simple enough
 and the functions named sensibly enough that a quick stroll through the
 various .h and .c files should be adequate to your understanding.
+
+# Building
+
+    $ aclocal -I m4
+    $ autoconf
+    $ automake --foreign --add-missing
+    [ignore anything that looks like an error here]
+    $ ./configure
+    $ make
+    $ sudo make install
+
+You will also have to manually copy libunicorn.pc to a place that
+pkg-config can get at it.
