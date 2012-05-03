@@ -6,6 +6,7 @@ includedir=@includedir@
 Name: @PACKAGE_NAME@
 Description: The magical IRC client library
 Version: @PACKAGE_VERSION@
+Requires: libmowgli-2
 
 Libs: -L${libdir} -lunicorn
 Cflags: -I${includedir}/libunicorn
