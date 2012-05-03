@@ -2,7 +2,7 @@ dnl  To generate the configure script, call:
 dnl    aclocal -I m4
 dnl    autoconf
 
-AC_INIT([libunicorn], [0.1], [https://github.com/aji/libunicorn/issues])
+AC_INIT([libunicorn], [0.2-alpha1], [https://github.com/aji/libunicorn/issues])
 AC_CONFIG_SRCDIR(src)
 
 AC_PROG_CC
