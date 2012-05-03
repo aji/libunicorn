@@ -63,19 +63,16 @@ irc_hook_table_t *irc_hook_table_create()
 	return table;
 }
 
+void irc_hook_table_destroy_cb(const char *key, void *data, void *privdata)
+{
+	irc_hook_def_t *def = data;
+
+	irc_hook_destroy_all(def->head);
+	mowgli_free(def);
+}
 int irc_hook_table_destroy(irc_hook_table_t *table)
 {
-	mowgli_patricia_iteration_state_t state;
-	irc_hook_def_t *def;
-
-	mowgli_patricia_foreach_start(table->hooks, &state);
-
-	while ((def = mowgli_patricia_foreach_cur(table->hooks, &state)) != NULL) {
-		irc_hook_destroy_all(def->head);
-		mowgli_free(def);
-		mowgli_patricia_foreach_next(table->hooks, &state);
-	}
-
+	mowgli_patricia_destroy(table->hooks, irc_hook_table_destroy_cb, NULL);
 	mowgli_free(table);
 
 	return 0;
