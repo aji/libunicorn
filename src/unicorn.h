@@ -153,10 +153,14 @@ struct irc_hook {
 	void *priv;
 	void *next;
 };
+struct irc_hook_def {
+	struct irc_hook *head, *tail;
+};
 struct irc_hook_table {
 	mowgli_patricia_t *hooks;
 };
 typedef struct irc_hook irc_hook_t;
+typedef struct irc_hook_def irc_hook_def_t;
 typedef struct irc_hook_table irc_hook_table_t;
 
 extern irc_hook_table_t *irc_hook_table_create();

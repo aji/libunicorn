@@ -66,12 +66,13 @@ irc_hook_table_t *irc_hook_table_create()
 int irc_hook_table_destroy(irc_hook_table_t *table)
 {
 	mowgli_patricia_iteration_state_t state;
-	irc_hook_t *hook;
+	irc_hook_def_t *def;
 
 	mowgli_patricia_foreach_start(table->hooks, &state);
 
-	while ((hook = mowgli_patricia_foreach_cur(table->hooks, &state)) != NULL) {
-		irc_hook_destroy_all(hook);
+	while ((def = mowgli_patricia_foreach_cur(table->hooks, &state)) != NULL) {
+		irc_hook_destroy_all(def->head);
+		mowgli_free(def);
 		mowgli_patricia_foreach_next(table->hooks, &state);
 	}
 
@@ -83,17 +84,28 @@ int irc_hook_table_destroy(irc_hook_table_t *table)
 
 int irc_hook_add(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb, void *priv)
 {
-	irc_hook_t *newhook, *head;
+	irc_hook_t *newhook;
+	irc_hook_def_t *def;
 
 	newhook = irc_hook_create(cb, priv);
 	if (newhook == NULL)
 		return -1;
 
-	head = mowgli_patricia_delete(table->hooks, hook);
+	def = mowgli_patricia_delete(table->hooks, hook);
 
-	newhook->next = head;
+	if (def == NULL) {
+		def = mowgli_alloc(sizeof(*def));
+		if (def == NULL)
+			return -1;
+		memset(def, 0, sizeof(*def));
 
-	if (!mowgli_patricia_add(table->hooks, hook, newhook))
+		def->head = def->tail = newhook;
+	} else {
+		def->tail->next = newhook;
+		def->tail = newhook;
+	}
+
+	if (!mowgli_patricia_add(table->hooks, hook, def))
 		return -1;
 
 	return 0;
@@ -103,10 +115,13 @@ int irc_hook_add(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb, v
 int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, const char *parv[])
 {
 	irc_hook_t *curr;
+	irc_hook_def_t *def;
 
-	curr = mowgli_patricia_retrieve(table->hooks, hook);
-	if (curr == NULL)
+	def = mowgli_patricia_retrieve(table->hooks, hook);
+	if (def == NULL)
 		return -1;
+
+	curr = def->head;
 
 	while (curr) {
 		if (curr->cb)
