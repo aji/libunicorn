@@ -34,7 +34,7 @@ extern int irc_log(int level, char *fmt, ...);
 
 struct irc_message {
 	/* 512-byte character buffer */
-	char buffer[512];
+	char buffer[513];
 
 	/* potential source */
 	union irc_message_source {
