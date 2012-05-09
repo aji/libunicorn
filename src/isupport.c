@@ -156,6 +156,10 @@ int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg)
 		if (value)
 			*value++ = '\0';
 
+		if (mowgli_patricia_retrieve(isupport->values, param) != NULL)
+			mowgli_free(mowgli_patricia_delete(isupport->values, param));
+		mowgli_patricia_add(isupport->values, param, mowgli_strdup(value ? value : ""));
+
 		cb = NULL;
 
 		if (!strcmp(param, "CASEMAPPING"))

@@ -109,6 +109,8 @@ struct irc_isupport {
                 mowgli_string_t *mode;
                 mowgli_string_t *prefix;
         } prefix;
+
+	mowgli_patricia_t *values;
 };
 typedef struct irc_isupport irc_isupport_t;
 
