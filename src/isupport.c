@@ -17,6 +17,76 @@ void mowgli_string_copy(mowgli_string_t *self, const char *src, size_t n)
 	self->append(self, src, n);
 }
 
+
+void irc_isupport_values_canonize(char *key)
+{
+	while (*key) {
+		*key = toupper(*key);
+		key++;
+	}
+}
+irc_isupport_t *irc_isupport_create(void)
+{
+	irc_isupport_t *isupport;
+
+	isupport = mowgli_alloc(sizeof(*isupport));
+
+	isupport->chanmodes.list = mowgli_string_create();
+	isupport->chanmodes.arg_always = mowgli_string_create();
+	isupport->chanmodes.arg_onset = mowgli_string_create();
+	isupport->chanmodes.noarg = mowgli_string_create();
+
+	isupport->chantypes = mowgli_string_create();
+
+	isupport->prefix.mode = mowgli_string_create();
+	isupport->prefix.prefix = mowgli_string_create();
+
+	isupport->values = mowgli_patricia_create(irc_isupport_values_canonize);
+
+	irc_isupport_reset(isupport);
+
+	return isupport;
+}
+
+void irc_isupport_destroy_cb(const char *key, void *data, void *privdata)
+{
+	mowgli_free(data);
+}
+int irc_isupport_destroy(irc_isupport_t *isupport)
+{
+	mowgli_string_destroy(isupport->chanmodes.list);
+	mowgli_string_destroy(isupport->chanmodes.arg_always);
+	mowgli_string_destroy(isupport->chanmodes.arg_onset);
+	mowgli_string_destroy(isupport->chanmodes.noarg);
+
+	mowgli_string_destroy(isupport->chantypes);
+
+	mowgli_string_destroy(isupport->prefix.mode);
+	mowgli_string_destroy(isupport->prefix.prefix);
+
+	mowgli_patricia_destroy(isupport->values, irc_isupport_destroy_cb, NULL);
+
+	return 0;
+}
+
+int irc_isupport_reset(irc_isupport_t *isupport)
+{
+	isupport->casemapping = IRC_ISUPPORT_CASEMAPPING_RFC1459;
+
+	// TODO: chanmodes
+
+	mowgli_string_copy(isupport->chantypes, "#", 1);
+
+	isupport->modes = 1;
+	isupport->nicklen = 8;
+
+	mowgli_string_copy(isupport->prefix.mode, "ov", 2);
+	mowgli_string_copy(isupport->prefix.prefix, "@+", 2);
+
+	return 0;
+}
+
+
 char *irc_isupport_strtok(char **buf, int chr)
 {
 	char *at;

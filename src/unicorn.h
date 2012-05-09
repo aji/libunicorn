@@ -114,6 +114,12 @@ struct irc_isupport {
 };
 typedef struct irc_isupport irc_isupport_t;
 
+extern irc_isupport_t *irc_isupport_create(void);
+extern int irc_isupport_destroy(irc_isupport_t *isupport);
+
+// Reset ISUPPORT to IRC defaults, useful on 001
+extern int irc_isupport_reset(irc_isupport_t *isupport);
+
 // This function strncpy's to non-NULL string types
 // The args in msg are not left intact
 extern int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg);
