@@ -121,8 +121,10 @@ int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, const cha
 	curr = def->head;
 
 	while (curr) {
-		if (curr->cb)
-			curr->cb(parc, parv, curr->priv);
+		if (curr->cb) {
+			if (curr->cb(parc, parv, curr->priv) != 0)
+				break;
+		}
 
 		curr = curr->next;
 	}
