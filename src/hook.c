@@ -140,6 +140,9 @@ int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg)
 
 int irc_hook_prefix_dispatch(irc_hook_table_t *table, irc_message_t *msg, const char *prefix)
 {
+	// TODO: deprecate this? prefixes can be accomplished with
+	// multiple hook tables. The existence of this feature is
+	// largely unjustified.
 	mowgli_node_t *n;
 	char *command;
 	int parc, i;
@@ -169,6 +172,39 @@ int irc_hook_prefix_dispatch(irc_hook_table_t *table, irc_message_t *msg, const 
 	i = irc_hook_call(table, command, parc, (const char**)parv);
 
 	mowgli_free(command);
+	mowgli_free(parv);
+
+	return i;
+}
+
+int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg)
+{
+	// TODO: merge this with irc_hook_prefix_dispatch somehow?
+	mowgli_node_t *n;
+	int parc, i;
+	size_t len;
+	char **parv;
+
+	parc = msg->args.count + 1;
+	parv = mowgli_alloc_array(sizeof(char*), parc);
+
+	parv[0] = parv[1] = parv[2] = NULL;
+	if (msg->source.type == IRC_MESSAGE_SOURCE_SERVER) {
+		parv[2] = msg->source.server.name;
+	} else if (msg->source.type == IRC_MESSAGE_SOURCE_USER) {
+		parv[0] = (msg->source.user.nick ? msg->source.user.nick : "");
+		parv[1] = (msg->source.user.ident ? msg->source.user.ident : "");
+		parv[2] = (msg->source.user.host ? msg->source.user.host : "");
+	}
+
+	i = 3;
+	MOWGLI_LIST_FOREACH(n, msg->args.head) {
+		parv[i] = n->data;
+		i++;
+	}
+
+	i = irc_hook_call(table, msg->command, parc, (const char**)parv);
+
 	mowgli_free(parv);
 
 	return i;

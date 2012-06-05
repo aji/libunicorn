@@ -203,5 +203,13 @@ extern int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg)
 // effect.
 extern int irc_hook_prefix_dispatch(irc_hook_table_t *table, irc_message_t *msg, const char *prefix);
 
+// This function behaves similarly to irc_hook_simple_dispatch, except
+// instead of parv[1] being the first argument, parv[3] is the first
+// argument, and parv[0], parv[1], and parv[2] are the nickname, ident,
+// and host of the source, respectively. If the source is a server,
+// parv[0] and parv[1] will be empty strings and parv[2] will be the
+// server name. If there is no source, then all of parv[0], parv[1],
+// and parv[2] will be empty.
+extern int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg);
 
 #endif
