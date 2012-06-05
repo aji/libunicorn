@@ -144,16 +144,12 @@ int irc_hook_prefix_dispatch(irc_hook_table_t *table, irc_message_t *msg, const 
 	// multiple hook tables. The existence of this feature is
 	// largely unjustified.
 	mowgli_node_t *n;
-	char *command;
+	char command[512];
 	int parc, i;
 	size_t len;
 	char **parv;
 
-	len = strlen(prefix) + strlen(msg->command) + 1;
-	command = mowgli_alloc(len);
-	memset(command, 0, len);
-	strcpy(command, prefix);
-	strcat(command, msg->command);
+	snprintf(command, 512, "%s%s", prefix, msg->command);
 
 	parc = msg->args.count + 1;
 	parv = mowgli_alloc_array(sizeof(char*), parc);
@@ -171,7 +167,6 @@ int irc_hook_prefix_dispatch(irc_hook_table_t *table, irc_message_t *msg, const 
 
 	i = irc_hook_call(table, command, parc, (const char**)parv);
 
-	mowgli_free(command);
 	mowgli_free(parv);
 
 	return i;
