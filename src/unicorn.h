@@ -159,10 +159,6 @@ typedef int (irc_hook_cb_t)(int parc, const char *parv[], void *priv);
 struct irc_hook {
 	irc_hook_cb_t *cb;
 	void *priv;
-	void *next;
-};
-struct irc_hook_def {
-	struct irc_hook *head, *tail;
 };
 struct irc_hook_table {
 	mowgli_patricia_t *hooks;
@@ -174,7 +170,7 @@ typedef struct irc_hook_table irc_hook_table_t;
 extern irc_hook_table_t *irc_hook_table_create();
 extern int irc_hook_table_destroy(irc_hook_table_t *table);
 
-// Callbacks are called in the order they are added
+// Callbacks are called in the order they are added and are case-insensitive
 extern int irc_hook_add(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb, void *priv);
 
 // If a callback returns nonzero, this exits early

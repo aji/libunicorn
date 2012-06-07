@@ -21,20 +21,8 @@ irc_hook_t *irc_hook_create(irc_hook_cb_t *cb, void *priv)
 
 	hook->cb = cb;
 	hook->priv = priv;
-	hook->next = NULL;
 
 	return hook;
-}
-
-void irc_hook_destroy_all(irc_hook_t *hook)
-{
-	irc_hook_t *next;
-
-	while (hook) {
-		next = hook->next;
-		mowgli_free(hook);
-		hook = next;
-	}
 }
 
 
@@ -65,10 +53,16 @@ irc_hook_table_t *irc_hook_table_create()
 
 void irc_hook_table_destroy_cb(const char *key, void *data, void *privdata)
 {
-	irc_hook_def_t *def = data;
+	mowgli_list_t *list = data;
+	mowgli_node_t *n, *tn;
 
-	irc_hook_destroy_all(def->head);
-	mowgli_free(def);
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, list->head) {
+		mowgli_free(n->data);
+		mowgli_node_delete(n, list);
+		mowgli_node_free(n);
+	}
+
+	mowgli_list_free(list);
 }
 int irc_hook_table_destroy(irc_hook_table_t *table)
 {
@@ -79,54 +73,48 @@ int irc_hook_table_destroy(irc_hook_table_t *table)
 }
 
 
-int irc_hook_add(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb, void *priv)
+int irc_hook_add(irc_hook_table_t *table, const char *hookname, irc_hook_cb_t *cb, void *priv)
 {
 	irc_hook_t *newhook;
-	irc_hook_def_t *def;
+	mowgli_list_t *list;
 
 	newhook = irc_hook_create(cb, priv);
 	if (newhook == NULL)
 		return -1;
 
-	def = mowgli_patricia_delete(table->hooks, hook);
+	list = mowgli_patricia_delete(table->hooks, hookname);
 
-	if (def == NULL) {
-		def = mowgli_alloc(sizeof(*def));
-		if (def == NULL)
+	if (list == NULL) {
+		list = mowgli_list_create();
+		if (list == NULL)
 			return -1;
-		memset(def, 0, sizeof(*def));
-
-		def->head = def->tail = newhook;
-	} else {
-		def->tail->next = newhook;
-		def->tail = newhook;
 	}
 
-	if (!mowgli_patricia_add(table->hooks, hook, def))
+	mowgli_node_add(newhook, mowgli_node_create(), list);
+
+	if (!mowgli_patricia_add(table->hooks, hookname, list))
 		return -1;
 
 	return 0;
 }
 
 
-int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, const char *parv[])
+int irc_hook_call(irc_hook_table_t *table, const char *hookname, int parc, const char *parv[])
 {
-	irc_hook_t *curr;
-	irc_hook_def_t *def;
+	mowgli_list_t *list;
+	mowgli_node_t *n;
+	irc_hook_t *hook;
 
-	def = mowgli_patricia_retrieve(table->hooks, hook);
-	if (def == NULL)
+	list = mowgli_patricia_retrieve(table->hooks, hookname);
+	if (list == NULL)
 		return -1;
 
-	curr = def->head;
+	MOWGLI_LIST_FOREACH(n, list->head) {
+		hook = n->data;
 
-	while (curr) {
-		if (curr->cb) {
-			if (curr->cb(parc, parv, curr->priv) != 0)
+		if (hook->cb)
+			if (hook->cb(parc, parv, hook->priv) != 0)
 				break;
-		}
-
-		curr = curr->next;
 	}
 
 	return 0;
