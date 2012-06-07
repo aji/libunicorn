@@ -11,21 +11,6 @@
 #include "unicorn.h"
 
 
-irc_hook_t *irc_hook_create(irc_hook_cb_t *cb)
-{
-	irc_hook_t *hook;
-
-	hook = mowgli_alloc(sizeof(*hook));
-	if (hook == NULL)
-		return NULL;
-
-	// LOL THIS IS RETARDED
-	hook->cb = cb;
-
-	return hook;
-}
-
-
 void irc_hook_table_canonize(char *str)
 {
 	while (*str) {
@@ -75,12 +60,7 @@ int irc_hook_table_destroy(irc_hook_table_t *table)
 
 int irc_hook_add(irc_hook_table_t *table, const char *hookname, irc_hook_cb_t *cb)
 {
-	irc_hook_t *newhook;
 	mowgli_list_t *list;
-
-	newhook = irc_hook_create(cb);
-	if (newhook == NULL)
-		return -1;
 
 	list = mowgli_patricia_delete(table->hooks, hookname);
 
@@ -90,7 +70,7 @@ int irc_hook_add(irc_hook_table_t *table, const char *hookname, irc_hook_cb_t *c
 			return -1;
 	}
 
-	mowgli_node_add(newhook, mowgli_node_create(), list);
+	mowgli_node_add(cb, mowgli_node_create(), list);
 
 	if (!mowgli_patricia_add(table->hooks, hookname, list))
 		return -1;
@@ -110,10 +90,7 @@ int irc_hook_del(irc_hook_table_t *table, const char *hookname, irc_hook_cb_t *c
 		return 0;
 
 	MOWGLI_LIST_FOREACH(n, list->head) {
-		hook = n->data;
-
-		if (hook->cb == cb) {
-			mowgli_free(hook);
+		if (n->data == cb) {
 			mowgli_node_delete(n, list);
 			mowgli_node_free(n);
 			break;
@@ -135,18 +112,17 @@ int irc_hook_call(irc_hook_table_t *table, const char *hookname, int parc, const
 {
 	mowgli_list_t *list;
 	mowgli_node_t *n;
-	irc_hook_t *hook;
+	irc_hook_cb_t *cb;
 
 	list = mowgli_patricia_retrieve(table->hooks, hookname);
 	if (list == NULL)
 		return -1;
 
 	MOWGLI_LIST_FOREACH(n, list->head) {
-		hook = n->data;
+		cb = n->data;
 
-		if (hook->cb)
-			if (hook->cb(parc, parv, ctx) != 0)
-				break;
+		if (cb(parc, parv, ctx) != 0)
+			break;
 	}
 
 	return 0;

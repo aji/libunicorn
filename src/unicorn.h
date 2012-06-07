@@ -156,9 +156,6 @@ extern char irc_prefix_char(irc_prefix_t *pfx);
 
 typedef int (irc_hook_cb_t)(int parc, const char *parv[], void *ctx);
 
-struct irc_hook {
-	irc_hook_cb_t *cb;
-};
 struct irc_hook_table {
 	mowgli_patricia_t *hooks;
 };
