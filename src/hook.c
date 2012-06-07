@@ -155,21 +155,10 @@ int irc_hook_call(irc_hook_table_t *table, const char *hookname, int parc, const
 
 int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg)
 {
-	return irc_hook_prefix_dispatch(table, msg, "");
-}
-
-int irc_hook_prefix_dispatch(irc_hook_table_t *table, irc_message_t *msg, const char *prefix)
-{
-	// TODO: deprecate this? prefixes can be accomplished with
-	// multiple hook tables. The existence of this feature is
-	// largely unjustified.
 	mowgli_node_t *n;
-	char command[512];
 	int parc, i;
 	size_t len;
 	char **parv;
-
-	snprintf(command, 512, "%s%s", prefix, msg->command);
 
 	parc = msg->args.count + 1;
 	parv = mowgli_alloc_array(sizeof(char*), parc);
@@ -185,7 +174,7 @@ int irc_hook_prefix_dispatch(irc_hook_table_t *table, irc_message_t *msg, const 
 		i++;
 	}
 
-	i = irc_hook_call(table, command, parc, (const char**)parv);
+	i = irc_hook_call(table, msg->command, parc, (const char**)parv);
 
 	mowgli_free(parv);
 
