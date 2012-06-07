@@ -154,11 +154,10 @@ extern char irc_prefix_char(irc_prefix_t *pfx);
 
 // NOTE: hooks are case-insensitive
 
-typedef int (irc_hook_cb_t)(int parc, const char *parv[], void *priv);
+typedef int (irc_hook_cb_t)(int parc, const char *parv[], void *ctx);
 
 struct irc_hook {
 	irc_hook_cb_t *cb;
-	void *priv;
 };
 struct irc_hook_table {
 	mowgli_patricia_t *hooks;
@@ -171,11 +170,11 @@ extern irc_hook_table_t *irc_hook_table_create();
 extern int irc_hook_table_destroy(irc_hook_table_t *table);
 
 // Callbacks are called in the order they are added and are case-insensitive
-extern int irc_hook_add(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb, void *priv);
+extern int irc_hook_add(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb);
 extern int irc_hook_del(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb);
 
 // If a callback returns nonzero, this exits early
-extern int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, const char *parv[]);
+extern int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, const char *parv[], void *ctx);
 
 // This function will take a message and call a particular hook based on
 // a simple transformation. The hook to be called is simply the message
@@ -190,7 +189,7 @@ extern int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, co
 //       calls "PING" with arguments "", "t4.general.asu.edu"
 //   ":aji!alex@asu.edu PRIVMSG #lobby :hi"
 //       calls "PRIVMSG" with arguments "aji", "#lobby", "hi"
-extern int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg);
+extern int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *ctx);
 
 // This function behaves similarly to irc_hook_simple_dispatch, except
 // instead of parv[1] being the first argument, parv[3] is the first
@@ -208,6 +207,6 @@ extern int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg)
 //   ":t4.general.asu.edu NOTICE :*** Notice -- Looking up your hostname"
 //       calls "NOTICE" with arguments "", "", "t4.general.asu.edu",
 //       "*** Notice -- Looking up your hostname"
-extern int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg);
+extern int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *ctx);
 
 #endif

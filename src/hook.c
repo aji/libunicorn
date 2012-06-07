@@ -11,7 +11,7 @@
 #include "unicorn.h"
 
 
-irc_hook_t *irc_hook_create(irc_hook_cb_t *cb, void *priv)
+irc_hook_t *irc_hook_create(irc_hook_cb_t *cb)
 {
 	irc_hook_t *hook;
 
@@ -19,8 +19,8 @@ irc_hook_t *irc_hook_create(irc_hook_cb_t *cb, void *priv)
 	if (hook == NULL)
 		return NULL;
 
+	// LOL THIS IS RETARDED
 	hook->cb = cb;
-	hook->priv = priv;
 
 	return hook;
 }
@@ -73,12 +73,12 @@ int irc_hook_table_destroy(irc_hook_table_t *table)
 }
 
 
-int irc_hook_add(irc_hook_table_t *table, const char *hookname, irc_hook_cb_t *cb, void *priv)
+int irc_hook_add(irc_hook_table_t *table, const char *hookname, irc_hook_cb_t *cb)
 {
 	irc_hook_t *newhook;
 	mowgli_list_t *list;
 
-	newhook = irc_hook_create(cb, priv);
+	newhook = irc_hook_create(cb);
 	if (newhook == NULL)
 		return -1;
 
@@ -131,7 +131,7 @@ int irc_hook_del(irc_hook_table_t *table, const char *hookname, irc_hook_cb_t *c
 }
 
 
-int irc_hook_call(irc_hook_table_t *table, const char *hookname, int parc, const char *parv[])
+int irc_hook_call(irc_hook_table_t *table, const char *hookname, int parc, const char *parv[], void *ctx)
 {
 	mowgli_list_t *list;
 	mowgli_node_t *n;
@@ -145,7 +145,7 @@ int irc_hook_call(irc_hook_table_t *table, const char *hookname, int parc, const
 		hook = n->data;
 
 		if (hook->cb)
-			if (hook->cb(parc, parv, hook->priv) != 0)
+			if (hook->cb(parc, parv, ctx) != 0)
 				break;
 	}
 
@@ -153,7 +153,7 @@ int irc_hook_call(irc_hook_table_t *table, const char *hookname, int parc, const
 }
 
 
-int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg)
+int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *ctx)
 {
 	mowgli_node_t *n;
 	int parc, i;
@@ -174,14 +174,14 @@ int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg)
 		i++;
 	}
 
-	i = irc_hook_call(table, msg->command, parc, (const char**)parv);
+	i = irc_hook_call(table, msg->command, parc, (const char**)parv, ctx);
 
 	mowgli_free(parv);
 
 	return i;
 }
 
-int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg)
+int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *ctx)
 {
 	// TODO: merge this with irc_hook_prefix_dispatch somehow?
 	mowgli_node_t *n;
@@ -207,7 +207,7 @@ int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg)
 		i++;
 	}
 
-	i = irc_hook_call(table, msg->command, parc, (const char**)parv);
+	i = irc_hook_call(table, msg->command, parc, (const char**)parv, ctx);
 
 	mowgli_free(parv);
 
