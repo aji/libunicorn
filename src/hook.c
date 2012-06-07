@@ -98,6 +98,38 @@ int irc_hook_add(irc_hook_table_t *table, const char *hookname, irc_hook_cb_t *c
 	return 0;
 }
 
+int irc_hook_del(irc_hook_table_t *table, const char *hookname, irc_hook_cb_t *cb)
+{
+	mowgli_list_t *list;
+	mowgli_node_t *n;
+	irc_hook_t *hook;
+
+	list = mowgli_patricia_delete(table->hooks, hookname);
+
+	if (list == NULL)
+		return 0;
+
+	MOWGLI_LIST_FOREACH(n, list->head) {
+		hook = n->data;
+
+		if (hook->cb == cb) {
+			mowgli_free(hook);
+			mowgli_node_delete(n, list);
+			mowgli_node_free(n);
+			break;
+		}
+	}
+
+	if (list->count == 0) {
+		mowgli_list_free(list);
+	} else {
+		if (!mowgli_patricia_add(table->hooks, hookname, list))
+			return -1;
+	}
+
+	return 0;
+}
+
 
 int irc_hook_call(irc_hook_table_t *table, const char *hookname, int parc, const char *parv[])
 {

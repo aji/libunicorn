@@ -172,6 +172,7 @@ extern int irc_hook_table_destroy(irc_hook_table_t *table);
 
 // Callbacks are called in the order they are added and are case-insensitive
 extern int irc_hook_add(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb, void *priv);
+extern int irc_hook_del(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb);
 
 // If a callback returns nonzero, this exits early
 extern int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, const char *parv[]);
