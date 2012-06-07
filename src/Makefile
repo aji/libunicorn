@@ -1,7 +1,7 @@
 include ../extra.mk
 
 LIB_MAJOR = 0
-LIB_MINOR = 2
+LIB_MINOR = 3
 
 SHARED_LIB = libunicorn.so
 STATIC_LIB =

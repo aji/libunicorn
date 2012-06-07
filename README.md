@@ -1,4 +1,4 @@
-# libunicorn
+# libunicorn v0.3
 
 This was created partially out of frustration with the lack of a quality
 IRC client library. I guess maybe I'm just too picky...
