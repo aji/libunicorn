@@ -1,3 +1,12 @@
+New in version 0.3
+
+    - Add extended dispatch of IRC messages to hooks
+
+    - Allow hooks to be deleted
+
+    - Change hook calling convention to use pointers supplied at call
+      time rather than at hook time.
+
 New in version 0.2
 
     - The message parser functions now clear out the argument list
