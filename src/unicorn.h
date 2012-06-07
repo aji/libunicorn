@@ -199,6 +199,15 @@ extern int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg)
 // parv[0] and parv[1] will be empty strings and parv[2] will be the
 // server name. If there is no source, then all of parv[0], parv[1],
 // and parv[2] will be empty.
+//
+// Examples:
+//   ":aji!alex@asu.edu JOIN #lobby"
+//       calls "JOIN" with arguments "aji", "alex", "asu.edu", "#lobby"
+//   "PING :t4.general.asu.edu"
+//       calls "PING" with arguments "", "", "", "t4.general.asu.edu"
+//   ":t4.general.asu.edu NOTICE :*** Notice -- Looking up your hostname"
+//       calls "NOTICE" with arguments "", "", "t4.general.asu.edu",
+//       "*** Notice -- Looking up your hostname"
 extern int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg);
 
 #endif
