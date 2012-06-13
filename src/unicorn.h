@@ -1,5 +1,5 @@
-#ifndef __INC_CHAT_H__
-#define __INC_CHAT_H__
+#ifndef __INC_UNICORN_H__
+#define __INC_UNICORN_H__
 
 
 #include <stddef.h>
