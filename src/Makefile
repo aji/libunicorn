@@ -10,7 +10,6 @@ INCLUDES = unicorn.h
 
 SRCS = hook.c \
 	isupport.c \
-	log.c \
 	message.c \
 	mode.c \
 	nick.c

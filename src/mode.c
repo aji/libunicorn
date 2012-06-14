@@ -40,8 +40,6 @@ int irc_prefix_set(irc_prefix_t *pfx, char mode)
 {
 	char *p, *q;
 
-	irc_log_debug("irc_prefix_set: +%c\n", mode);
-
 	if (pfx == NULL)
 		return -1;
 
@@ -59,8 +57,6 @@ int irc_prefix_set(irc_prefix_t *pfx, char mode)
 int irc_prefix_clear(irc_prefix_t *pfx, char mode)
 {
 	char *p, *q;
-
-	irc_log_debug("irc_prefix_clear: -%c\n", mode);
 
 	if (pfx == NULL)
 		return -1;
