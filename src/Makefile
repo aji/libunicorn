@@ -12,7 +12,7 @@ SRCS = hook.c \
 	isupport.c \
 	message.c \
 	mode.c \
-	nick.c
+	casemap.c
 
 include ../buildsys.mk
 

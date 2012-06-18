@@ -54,12 +54,12 @@ extern int irc_message_parse(irc_message_t *msg, const char *spec);
 extern int irc_message_format(irc_message_t *msg, mowgli_string_t *str);
 
 
-/* src/nick.c */
+/* src/casemap.c */
 
-extern void irc_nick_canonize_null(char *nick);
-extern void irc_nick_canonize_ascii(char *nick);
-extern void irc_nick_canonize_rfc1459(char *nick);
-extern void irc_nick_canonize_strict_rfc1459(char *nick);
+extern void irc_casemap_null(char *s);
+extern void irc_casemap_ascii(char *s);
+extern void irc_casemap_rfc1459(char *s);
+extern void irc_casemap_strict_rfc1459(char *s);
 
 
 /* src/isupport.c */
