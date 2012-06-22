@@ -137,7 +137,7 @@ int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *
 	char **parv;
 
 	parc = msg->args.count + 1;
-	parv = mowgli_alloc_array(sizeof(char*), parc);
+	parv = mowgli_alloc(sizeof(char*) * parc);
 
 	if (msg->source.type == IRC_MESSAGE_SOURCE_NONE)
 		parv[0] = "";
@@ -165,8 +165,8 @@ int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *ctx
 	size_t len;
 	char **parv;
 
-	parc = msg->args.count + 1;
-	parv = mowgli_alloc_array(sizeof(char*), parc);
+	parc = msg->args.count + 3;
+	parv = mowgli_alloc(sizeof(char*) * parc);
 
 	parv[0] = parv[1] = parv[2] = NULL;
 	if (msg->source.type == IRC_MESSAGE_SOURCE_SERVER) {
