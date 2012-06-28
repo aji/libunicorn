@@ -271,3 +271,9 @@ char *irc_isupport_get_prefix_char(irc_isupport_t *isupport)
 	return isupport->prefix.prefix->str;
 }
 
+int irc_isupport_get_casemapping(irc_isupport_t *isupport)
+{
+	if (isupport == NULL)
+		return IRC_CASEMAPPING_UNKNOWN;
+	return isupport->casemapping;
+}

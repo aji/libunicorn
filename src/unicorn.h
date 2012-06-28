@@ -110,6 +110,7 @@ extern int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg);
 
 extern char *irc_isupport_get_prefix_mode(irc_isupport_t *isupport);
 extern char *irc_isupport_get_prefix_char(irc_isupport_t *isupport);
+extern int irc_isupport_get_casemapping(irc_isupport_t *isupport);
 
 
 /* src/mode.c */
