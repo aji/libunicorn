@@ -71,7 +71,7 @@ int irc_isupport_destroy(irc_isupport_t *isupport)
 
 int irc_isupport_reset(irc_isupport_t *isupport)
 {
-	isupport->casemapping = IRC_ISUPPORT_CASEMAPPING_RFC1459;
+	isupport->casemapping = IRC_CASEMAPPING_RFC1459;
 
 	// TODO: chanmodes
 
@@ -108,17 +108,17 @@ char *irc_isupport_strtok(char **buf, int chr)
 int irc_isupport_casemapping(irc_isupport_t *isupport, char *value)
 {
 	// default to RFC 1459 casemapping
-	isupport->casemapping = IRC_ISUPPORT_CASEMAPPING_RFC1459;
+	isupport->casemapping = IRC_CASEMAPPING_RFC1459;
 
 	if (value == NULL)
 		return -1;
 
 	if (!strcmp(value, "ascii"))
-		isupport->casemapping = IRC_ISUPPORT_CASEMAPPING_ASCII;
+		isupport->casemapping = IRC_CASEMAPPING_ASCII;
 	else if (!strcmp(value, "rfc1459"))
-		isupport->casemapping = IRC_ISUPPORT_CASEMAPPING_RFC1459;
+		isupport->casemapping = IRC_CASEMAPPING_RFC1459;
 	else if (!strcmp(value, "strict-rfc1459"))
-		isupport->casemapping = IRC_ISUPPORT_CASEMAPPING_STRICT_RFC1459;
+		isupport->casemapping = IRC_CASEMAPPING_STRICT_RFC1459;
 
 	return 0;
 }

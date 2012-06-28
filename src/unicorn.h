@@ -56,18 +56,22 @@ extern int irc_message_format(irc_message_t *msg, mowgli_string_t *str);
 
 /* src/casemap.c */
 
+#define IRC_CASEMAPPING_UNKNOWN 0
+#define IRC_CASEMAPPING_ASCII 1
+#define IRC_CASEMAPPING_RFC1459 2
+#define IRC_CASEMAPPING_STRICT_RFC1459 3
+
+extern int irc_casecmp(int casemapping, char *a, char *b);
+
 extern void irc_casemap_null(char *s);
 extern void irc_casemap_ascii(char *s);
 extern void irc_casemap_rfc1459(char *s);
 extern void irc_casemap_strict_rfc1459(char *s);
 
+extern void (*irc_casemap_fn(int casemapping))(char*);
+
 
 /* src/isupport.c */
-
-#define IRC_ISUPPORT_CASEMAPPING_UNKNOWN 0
-#define IRC_ISUPPORT_CASEMAPPING_ASCII 1
-#define IRC_ISUPPORT_CASEMAPPING_RFC1459 2
-#define IRC_ISUPPORT_CASEMAPPING_STRICT_RFC1459 3
 
 struct irc_isupport {
         int casemapping;
