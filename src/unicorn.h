@@ -61,7 +61,7 @@ extern int irc_message_format(irc_message_t *msg, mowgli_string_t *str);
 #define IRC_CASEMAPPING_RFC1459 2
 #define IRC_CASEMAPPING_STRICT_RFC1459 3
 
-extern int irc_casecmp(int casemapping, char *a, char *b);
+extern int irc_casecmp(int casemapping, const char *a, const char *b);
 
 extern void irc_casemap_null(char *s);
 extern void irc_casemap_ascii(char *s);

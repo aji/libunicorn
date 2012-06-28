@@ -43,7 +43,7 @@ static inline int charcmp(char a, char b)
 	return (int)a - (int)b;
 }
 
-int irc_casecmp(int casemapping, char *a, char *b)
+int irc_casecmp(int casemapping, const char *a, const char *b)
 {
 	int c;
 
