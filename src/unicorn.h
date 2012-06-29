@@ -53,8 +53,6 @@ extern int irc_message_parse_buffer(irc_message_t *msg);
 extern int irc_message_parse(irc_message_t *msg, const char *spec);
 extern int irc_message_format(irc_message_t *msg, mowgli_string_t *str);
 
-extern int irc_message_eol(irc_message_t *msg, char *dest, unsigned first);
-
 
 /* src/casemap.c */
 

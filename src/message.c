@@ -227,27 +227,3 @@ int irc_message_format(irc_message_t *msg, mowgli_string_t *str)
 	return 0;
 }
 
-int irc_message_eol(irc_message_t *msg, char *dest, unsigned first)
-{
-	mowgli_node_t *cur;
-	int i;
-
-	return_val_if_fail(msg && dest, -1);
-
-	i = first; // we need this to be signed
-	MOWGLI_LIST_FOREACH(cur, msg->args.head) {
-		i--;
-
-		if (i < 0) {
-			strcpy(dest, cur->data);
-			//dest = (char*)rawmemchr((void*)dest, '\0');
-			dest += strlen(dest);
-			if (cur->next != NULL)
-				*dest++ = ' ';			
-		}
-	}
-
-	*dest = '\0';
-
-	return 0;
-}
