@@ -134,10 +134,9 @@ int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *
 	mowgli_node_t *n;
 	int parc, i;
 	size_t len;
-	char **parv;
+	char *parv[256];
 
 	parc = msg->args.count + 1;
-	parv = mowgli_alloc(sizeof(char*) * parc);
 
 	if (msg->source.type == IRC_MESSAGE_SOURCE_NONE)
 		parv[0] = "";
@@ -152,21 +151,17 @@ int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *
 
 	i = irc_hook_call(table, msg->command, parc, (const char**)parv, ctx);
 
-	mowgli_free(parv);
-
 	return i;
 }
 
 int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *ctx)
 {
-	// TODO: merge this with irc_hook_prefix_dispatch somehow?
 	mowgli_node_t *n;
 	int parc, i;
 	size_t len;
-	char **parv;
+	char *parv[256];
 
 	parc = msg->args.count + 3;
-	parv = mowgli_alloc(sizeof(char*) * parc);
 
 	parv[0] = parv[1] = parv[2] = NULL;
 	if (msg->source.type == IRC_MESSAGE_SOURCE_SERVER) {
@@ -184,8 +179,6 @@ int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *ctx
 	}
 
 	i = irc_hook_call(table, msg->command, parc, (const char**)parv, ctx);
-
-	mowgli_free(parv);
 
 	return i;
 }
