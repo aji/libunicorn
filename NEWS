@@ -1,3 +1,12 @@
+New in version 0.4
+
+    - "make install" now installs libunicorn.pc
+
+    - Logging functionality has been removed
+
+    - Casemapping has been improved, and new case comparison functions
+      have been added.
+
 New in version 0.3
 
     - Add extended dispatch of IRC messages to hooks

@@ -1,4 +1,4 @@
-# libunicorn v0.3
+# libunicorn v0.4
 
 This was created partially out of frustration with the lack of a quality
 IRC client library. I guess maybe I'm just too picky...
@@ -40,6 +40,3 @@ various .h and .c files should be adequate to your understanding.
     $ ./configure
     $ make
     $ sudo make install
-
-You will also have to manually copy libunicorn.pc to a place that
-pkg-config can get at it.
