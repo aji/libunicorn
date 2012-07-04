@@ -15,6 +15,10 @@ use of the parsers and formatters in libunicorn.
 This project is licensed under the MIT license, contained in the COPYING
 file.
 
+# Support
+
+The official libunicorn channel is irc.staticbox.net #alicorn
+
 # Dependencies
 
 libunicorn currently depends only on libmowgli-2. Although libunicorn only
