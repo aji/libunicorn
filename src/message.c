@@ -58,23 +58,23 @@ int irc_message_source_parse(irc_message_source_t *source, char *spec)
 {
 	char *at;
 
-	// clear the structure to zeros to prevent any weirdness
+	/* clear the structure to zeros to prevent any weirdness */
 	memset(source, 0, sizeof(*source));
 
-	// skip over any : that may have snuck in
+	/* skip over any : that may have snuck in */
 	if (*spec == ':')
 		spec++;
 
-	// if the string is empty, then we're done here
+	/* if the string is empty, then we're done here */
 	if (*spec == '\0') {
 		source->type = IRC_MESSAGE_SOURCE_NONE;
 		return 0;
 	}
 
-	// assume the start of the string points to the nick
+	/* assume the start of the string points to the nick */
 	source->user.nick = spec;
 
-	// snag ourselves the ident
+	/* snag ourselves the ident */
 	at = strchr(spec, '!');
 	if (at != NULL) {
 		*at++ = '\0';
@@ -82,14 +82,14 @@ int irc_message_source_parse(irc_message_source_t *source, char *spec)
 		spec = at;
 	}
 
-	// and then the host
+	/* and then the host */
 	at = strchr(spec, '@');
 	if (at != NULL) {
 		*at++ = '\0';
 		source->user.host = at;
 	}
 
-	// and now we determine if the nick is actually a server name
+	/* and now we determine if the nick is actually a server name */
 	at = strchr(source->user.nick, '.');
 	if (at != NULL && source->user.ident == NULL && source->user.host == NULL)
 		source->type = IRC_MESSAGE_SOURCE_SERVER;
@@ -126,7 +126,7 @@ int irc_message_source_format(irc_message_source_t *source, mowgli_string_t *str
 		return 0;
 	}
 
-	// ummmm...
+	/* ummmm... */
 	return -1;
 }
 
@@ -138,19 +138,19 @@ int irc_message_parse_buffer(irc_message_t *msg)
 
 	spec = msg->buffer;
 
-	// clear out the argument list
+	/* clear out the argument list */
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, msg->args.head) {
 		mowgli_node_delete(n, &msg->args);
 		mowgli_node_free(n);
 	}
 
-	// first the sender, if any
+	/* first the sender, if any */
 	if (spec[0] == ':') {
 		spec++;
 		irc_message_source_parse(&msg->source, strtok_r(spec, " \r\n", &spec));
 	}
 
-	// then the command
+	/* then the command */
 	msg->command = strtok_r(spec, " \r\n", &spec);
 	if (!msg->command)
 		return -1;
@@ -160,7 +160,7 @@ int irc_message_parse_buffer(irc_message_t *msg)
 		at++;
 	}
 
-	// and now args repeatedly
+	/* and now args repeatedly */
 	while(spec && *spec) {
 		if (*spec == ':') {
 			mowgli_node_add(spec + 1, mowgli_node_create(), &msg->args);
@@ -171,7 +171,7 @@ int irc_message_parse_buffer(irc_message_t *msg)
 		}
 	}
 
-	// and strip any of those pesky \r\n's off the last argument
+	/* and strip any of those pesky \r\n's off the last argument */
 	if (msg->args.tail) {
 		spec = msg->args.tail->data;
 		if (at = strchr(spec, '\r'))
@@ -197,19 +197,19 @@ int irc_message_format(irc_message_t *msg, mowgli_string_t *str)
 
 	return_val_if_fail(str != NULL, -1);
 
-	// first the sender, if any
+	/* first the sender, if any */
 	if (msg->source.type != IRC_MESSAGE_SOURCE_NONE) {
 		str->append_char(str, ':');
 		irc_message_source_format(&msg->source, str);
 		str->append_char(str, ' ');
 	}
 
-	// then the command
+	/* then the command */
 	if (msg->command == NULL)
 		return -1;
 	str->append(str, msg->command, strlen(msg->command));
 
-	// and finally the arguments
+	/* and finally the arguments */
 	MOWGLI_LIST_FOREACH(curr, msg->args.head) {
 		str->append_char(str, ' ');
 

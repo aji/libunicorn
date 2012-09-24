@@ -101,11 +101,11 @@ typedef struct irc_isupport irc_isupport_t;
 extern irc_isupport_t *irc_isupport_create(void);
 extern int irc_isupport_destroy(irc_isupport_t *isupport);
 
-// Reset ISUPPORT to IRC defaults, useful on 001
+/* Reset ISUPPORT to IRC defaults, useful on 001 */
 extern int irc_isupport_reset(irc_isupport_t *isupport);
 
-// This function strncpy's to non-NULL string types
-// The args in msg are not left intact
+/* This function strncpy's to non-NULL string types.  The args in msg
+   are not left intact */
 extern int irc_isupport_parse(irc_isupport_t *isupport, irc_message_t *msg);
 
 extern char *irc_isupport_get_prefix_mode(irc_isupport_t *isupport);
@@ -116,11 +116,11 @@ extern int irc_isupport_get_casemapping(irc_isupport_t *isupport);
 /* src/mode.c */
 
 struct irc_prefix {
-	// While theoretically you could have more than 32 prefixes,
-	// in practice you typically see no more than 5.
+	/* While theoretically you could have more than 32 prefixes,
+	   in practice you typically see no more than 5. */
 	unsigned long bv;
 
-	// if this is NULL, the standard PREFIX=(ov)@+ applies
+	/* if this is NULL, the standard PREFIX=(ov)@+ applies */
 	irc_isupport_t *isupport;
 };
 typedef struct irc_prefix irc_prefix_t;
@@ -131,13 +131,13 @@ extern int irc_prefix_destroy(irc_prefix_t *pfx);
 extern int irc_prefix_set(irc_prefix_t *pfx, char mode);
 extern int irc_prefix_clear(irc_prefix_t *pfx, char mode);
 
-// will return ASCII space if no prefixes are set
+/* will return ASCII space if no prefixes are set */
 extern char irc_prefix_char(irc_prefix_t *pfx);
 
 
 /* src/hook.c */
 
-// NOTE: hooks are case-insensitive
+/* NOTE: hooks are case-insensitive */
 
 typedef int (irc_hook_cb_t)(int parc, const char *parv[], void *ctx);
 
@@ -151,44 +151,44 @@ typedef struct irc_hook_table irc_hook_table_t;
 extern irc_hook_table_t *irc_hook_table_create();
 extern int irc_hook_table_destroy(irc_hook_table_t *table);
 
-// Callbacks are called in the order they are added and are case-insensitive
+/* Callbacks are called in the order they are added and are case-insensitive */
 extern int irc_hook_add(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb);
 extern int irc_hook_del(irc_hook_table_t *table, const char *hook, irc_hook_cb_t *cb);
 
-// If a callback returns nonzero, this exits early
+/* If a callback returns nonzero, this exits early */
 extern int irc_hook_call(irc_hook_table_t *table, const char *hook, int parc, const char *parv[], void *ctx);
 
-// This function will take a message and call a particular hook based on
-// a simple transformation. The hook to be called is simply the message
-// command. The first argument is the sender's nick (or "" if there is
-// no sender), and the following arguments are simply the arguments to
-// the message.
-//
-// Examples:
-//   ":aji!alex@asu.edu JOIN #lobby"
-//       calls "JOIN" with arguments "aji", "#lobby"
-//   "PING :t4.general.asu.edu"
-//       calls "PING" with arguments "", "t4.general.asu.edu"
-//   ":aji!alex@asu.edu PRIVMSG #lobby :hi"
-//       calls "PRIVMSG" with arguments "aji", "#lobby", "hi"
+/* This function will take a message and call a particular hook based on
+   a simple transformation. The hook to be called is simply the message
+   command. The first argument is the sender's nick (or "" if there is
+   no sender), and the following arguments are simply the arguments to
+   the message.
+  
+   Examples:
+     ":aji!alex@asu.edu JOIN #lobby"
+         calls "JOIN" with arguments "aji", "#lobby"
+     "PING :t4.general.asu.edu"
+         calls "PING" with arguments "", "t4.general.asu.edu"
+     ":aji!alex@asu.edu PRIVMSG #lobby :hi"
+         calls "PRIVMSG" with arguments "aji", "#lobby", "hi" */
 extern int irc_hook_simple_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *ctx);
 
-// This function behaves similarly to irc_hook_simple_dispatch, except
-// instead of parv[1] being the first argument, parv[3] is the first
-// argument, and parv[0], parv[1], and parv[2] are the nickname, ident,
-// and host of the source, respectively. If the source is a server,
-// parv[0] and parv[1] will be empty strings and parv[2] will be the
-// server name. If there is no source, then all of parv[0], parv[1],
-// and parv[2] will be empty.
-//
-// Examples:
-//   ":aji!alex@asu.edu JOIN #lobby"
-//       calls "JOIN" with arguments "aji", "alex", "asu.edu", "#lobby"
-//   "PING :t4.general.asu.edu"
-//       calls "PING" with arguments "", "", "", "t4.general.asu.edu"
-//   ":t4.general.asu.edu NOTICE :*** Notice -- Looking up your hostname"
-//       calls "NOTICE" with arguments "", "", "t4.general.asu.edu",
-//       "*** Notice -- Looking up your hostname"
+/* This function behaves similarly to irc_hook_simple_dispatch, except
+   instead of parv[1] being the first argument, parv[3] is the first
+   argument, and parv[0], parv[1], and parv[2] are the nickname, ident,
+   and host of the source, respectively. If the source is a server,
+   parv[0] and parv[1] will be empty strings and parv[2] will be the
+   server name. If there is no source, then all of parv[0], parv[1],
+   and parv[2] will be empty.
+  
+   Examples:
+     ":aji!alex@asu.edu JOIN #lobby"
+         calls "JOIN" with arguments "aji", "alex", "asu.edu", "#lobby"
+     "PING :t4.general.asu.edu"
+         calls "PING" with arguments "", "", "", "t4.general.asu.edu"
+     ":t4.general.asu.edu NOTICE :*** Notice -- Looking up your hostname"
+         calls "NOTICE" with arguments "", "", "t4.general.asu.edu",
+         "*** Notice -- Looking up your hostname" */
 extern int irc_hook_ext_dispatch(irc_hook_table_t *table, irc_message_t *msg, void *ctx);
 
 #endif
